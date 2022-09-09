@@ -1,0 +1,18 @@
+{
+  "name": "personal-va",
+  "version": "1.0.0",
+  "description": "Un programma leggero per gestire la tua personale linea aerea virtuale",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Rubbonn/Personal-VA.git"
+  },
+  "author": "Ruben Giuriato",
+  "bugs": {
+    "url": "https://github.com/Rubbonn/Personal-VA/issues"
+  },
+  "homepage": "https://github.com/Rubbonn/Personal-VA#readme",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.2.0",
+    "startbootstrap-sb-admin": "^7.0.5"
+  }
+}

@@ -1,0 +1,3 @@
+.sb-sidenav .sb-sidenav-footer:empty {
+	display:none;
+}
