@@ -1,7 +1,7 @@
 from flask import Flask, g, redirect, render_template, request
 import sqlite3
 from os.path import exists
-from classes.forms import Inizializzazione
+from classes.forms.Inizializzazione import Inizializzazione
 
 app: Flask = Flask(__name__)
 database: str = app.root_path+'/personal-va.db'
