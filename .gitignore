@@ -1,0 +1,7 @@
+/Include
+/Lib
+/Scripts
+/static/node_modules
+pyvenv.cfg
+personal-va.db
+__pycache__
