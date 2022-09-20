@@ -28,16 +28,25 @@ if not exists(database):
 @app.route('/')
 def homepage():
 	db: sqlite3.Connection = getDbConnection()
-	inizializzato: bool = int(db.cursor().execute('SELECT valore FROM configurazioni WHERE nome LIKE "inizializzato"').fetchone()[0]) == 1
+	inizializzato: bool = db.cursor().execute('SELECT CAST(valore AS INTEGER) FROM configurazioni WHERE nome LIKE \'inizializzato\'').fetchone()[0] == 1
 	if not inizializzato:
 		return redirect('inizia')
-	return 'Benvenuto'
+	return render_template('pages/homepage.html')
 
-@app.route('/inizia')
+@app.route('/inizia', methods=['GET','POST'])
 def inizia():
-	form: Inizializzazione = Inizializzazione(request.form)
+	db: sqlite3.connection = getDbConnection()
+	inizializzato: bool = db.cursor().execute('SELECT CAST(valore AS INTEGER) FROM configurazioni WHERE nome LIKE \'inizializzato\'').fetchone()[0] == 1
+	if inizializzato:
+		return redirect('/')
+	elencoAeroporti: list = db.cursor().execute('SELECT id, nome || " (" || codice_icao || ")" FROM aeroporti ORDER BY nome ASC').fetchall()
+	form: Inizializzazione = Inizializzazione(elencoAeroporti, request.form)
 	if request.method == 'POST' and form.validate():
-		return 'Bravo!'
-	return render_template('pages/inizia.html')
+		cursore: sqlite3.Cursor = db.cursor()
+		cursore.executemany('UPDATE configurazioni SET valore = ? WHERE nome LIKE ?', [(form.nome.data, 'nome'), (form.cognome.data, 'cognome'), (1, 'inizializzato')])
+		cursore.execute('INSERT INTO aeromobili_posseduti ("id", "id_aeromobile", "aeroporto_attuale", "carburante", "miglia_percorse", "data_acquisto", "data_ultimo_volo") VALUES (1, 1, ?, 212, 0, date(), "")', (form.base.data,))
+		db.commit()
+		return redirect('/')
+	return render_template('pages/inizia.html', form=form)
 
-app.run('0.0.0.0', 80, True)
+app.run('0.0.0.0', 80, debug=True)

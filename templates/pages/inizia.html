@@ -2,5 +2,36 @@
 {% block title %}Configura i parametri iniziali{% endblock %}
 
 {% block content %}
-	Hello World
+<h1 class="mt-4">Setup iniziale</h1>
+<p>Per prima cosa, dobbiamo sapere chi sei</p>
+<div class="row justify-content-start">
+	<div class="col-3">
+		<form method="post" action="{{ url_for('inizia') }}">
+			<div class="mb-3">
+				<label class="form-label">Nome</label>
+				<input type="text" class="form-control {% if form.nome.errors %}is-invalid{% endif %}" name="nome"/>
+				{% if form.nome.errors %}
+					<ul class="invalid-feedback">{% for error in form.nome.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
+			</div>
+			<div class="mb-3">
+				<label class="form-label">Cognome</label>
+				<input type="text" class="form-control {% if form.cognome.errors %}is-invalid{% endif %}" name="cognome"/>
+				{% if form.cognome.errors %}
+					<ul class="invalid-feedback">{% for error in form.cognome.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
+			</div>
+			<div class="mb-3">
+				<label class="form-label">Aeroporto di partenza</label>
+				<select class="form-select {% if form.base.errors %}is-invalid{% endif %}" name="base">
+					<option value=""> - </option>
+					{% for option in form.base.choices %}
+					<option value="{{ option[0] }}">{{ option[1] }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<button type="submit" class="btn btn-primary">Salva</button>
+		</form>
+	</div>
+</div>
 {% endblock %}

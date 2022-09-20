@@ -5,15 +5,15 @@
 --
 
 CREATE TABLE `aeromobili` (
-  `id` smallint(5) NOT NULL PRIMARY KEY,
-  `nome` varchar(64) NOT NULL,
-  `capacita_serbatoio_l` smallint(6) NOT NULL,
-  `consumo_l_h` decimal(8,6) NOT NULL,
-  `numero_posti` smallint(6) NOT NULL,
-  `velocita_massima_kn` smallint(6) NOT NULL,
-  `velocita_crocera_kn` smallint(6) NOT NULL,
-  `grandezza_stiva_kg` decimal(5,2) NOT NULL,
-  `foto` varchar(64) NOT NULL
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `nome` TEXT NOT NULL,
+  `capacita_serbatoio_l` INTEGER NOT NULL,
+  `consumo_l_h` REAL NOT NULL,
+  `numero_posti` INTEGER NOT NULL,
+  `velocita_massima_kn` INTEGER NOT NULL,
+  `velocita_crocera_kn` INTEGER NOT NULL,
+  `grandezza_stiva_kg` REAL NOT NULL,
+  `foto` TEXT NOT NULL
 );
 
 --
@@ -26,17 +26,33 @@ INSERT INTO `aeromobili` (`id`, `nome`, `capacita_serbatoio_l`, `consumo_l_h`, `
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `aeromobili_posseduti`
+--
+
+CREATE TABLE `aeromobili_posseduti` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `id_aeromobile` INTEGER NOT NULL,
+  `aeroporto_attuale` INTEGER NOT NULL,
+  `carburante` REAL NOT NULL,
+  `miglia_percorse` REAL NOT NULL,
+  `data_acquisto` TEXT NOT NULL,
+  `data_ultimo_volo` TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `aeroporti`
 --
 
 CREATE TABLE `aeroporti` (
-  `id` smallint(5) NOT NULL PRIMARY KEY,
-  `codice_icao` char(4) NOT NULL,
-  `nome` varchar(64) NOT NULL,
-  `citta` varchar(64) NOT NULL,
-  `nazione` char(3) NOT NULL,
-  `latitudine` decimal(17,15) NOT NULL,
-  `longitudine` decimal(18,15) NOT NULL
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `codice_icao` TEXT NOT NULL,
+  `nome` TEXT NOT NULL,
+  `citta` TEXT NOT NULL,
+  `nazione` TEXT NOT NULL,
+  `latitudine` REAL NOT NULL,
+  `longitudine` REAL NOT NULL
 );
 
 --
@@ -207,8 +223,8 @@ INSERT INTO `aeroporti` (`id`, `codice_icao`, `nome`, `citta`, `nazione`, `latit
 --
 
 CREATE TABLE `configurazioni` (
-  `nome` varchar(64) NOT NULL PRIMARY KEY,
-  `valore` varchar(255) NOT NULL
+  `nome` TEXT NOT NULL PRIMARY KEY,
+  `valore` TEXT NOT NULL
 );
 
 --
@@ -216,6 +232,7 @@ CREATE TABLE `configurazioni` (
 --
 
 INSERT INTO `configurazioni` (`nome`, `valore`) VALUES
+('inizializzato', 0),
+('nome', ''),
 ('cognome', ''),
-('inizializzato', '0'),
-('nome', '');
+('saldo', 100000);
