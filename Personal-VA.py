@@ -4,6 +4,7 @@ import sqlite3
 from os.path import exists
 from classes.forms.Inizializzazione import Inizializzazione
 from classes.objectmodels.Configurazione import Configurazione
+from classes.objectmodels.Aeroporto import Aeroporto
 
 app: Flask = Flask(__name__)
 database: str = app.root_path+'/personal-va.db'
@@ -50,7 +51,7 @@ def inizia():
 	inizializzato: bool = configurazioni.getConfigurazione('inizializzato', 'INTEGER') == 1
 	if inizializzato:
 		return redirect('/')
-	elencoAeroporti: list = db.cursor().execute('SELECT id, nome || " (" || codice_icao || ")" FROM aeroporti ORDER BY nome ASC').fetchall()
+	elencoAeroporti: list = [(aeroporto.id, f'{aeroporto.nome} ({aeroporto.codice_icao})') for aeroporto in Aeroporto(db).getAeroporti()]
 	form: Inizializzazione = Inizializzazione(elencoAeroporti, request.form)
 	if request.method == 'POST' and form.validate():
 		cursore: sqlite3.Cursor = db.cursor()
