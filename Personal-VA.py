@@ -1,7 +1,9 @@
+from distutils.command.config import config
 from flask import Flask, g, redirect, render_template, request
 import sqlite3
 from os.path import exists
 from classes.forms.Inizializzazione import Inizializzazione
+from classes.objectmodels.Configurazione import Configurazione
 
 app: Flask = Flask(__name__)
 database: str = app.root_path+'/personal-va.db'
@@ -11,6 +13,13 @@ def getDbConnection() -> sqlite3.Connection:
 	if db is None:
 		db = g._database = sqlite3.connect(database)
 	return db
+
+def getConfigurationObject() -> Configurazione:
+	configurazioni: Configurazione = getattr(g, '_configurazioni', None)
+	if configurazioni is None:
+		db: sqlite3.Connection = getDbConnection()
+		configurazioni = g._configurazioni = Configurazione(db)
+	return configurazioni
 
 @app.teardown_appcontext
 def closeDbConnection(exception) -> None:
@@ -28,7 +37,8 @@ if not exists(database):
 @app.route('/')
 def homepage():
 	db: sqlite3.Connection = getDbConnection()
-	inizializzato: bool = db.cursor().execute('SELECT CAST(valore AS INTEGER) FROM configurazioni WHERE nome LIKE \'inizializzato\'').fetchone()[0] == 1
+	configurazioni: Configurazione = getConfigurationObject()
+	inizializzato: bool = configurazioni.getConfigurazione('inizializzato', 'INTEGER') == 1
 	if not inizializzato:
 		return redirect('inizia')
 	return render_template('pages/homepage.html')
@@ -36,14 +46,15 @@ def homepage():
 @app.route('/inizia', methods=['GET','POST'])
 def inizia():
 	db: sqlite3.connection = getDbConnection()
-	inizializzato: bool = db.cursor().execute('SELECT CAST(valore AS INTEGER) FROM configurazioni WHERE nome LIKE \'inizializzato\'').fetchone()[0] == 1
+	configurazioni: Configurazione = getConfigurationObject()
+	inizializzato: bool = configurazioni.getConfigurazione('inizializzato', 'INTEGER') == 1
 	if inizializzato:
 		return redirect('/')
 	elencoAeroporti: list = db.cursor().execute('SELECT id, nome || " (" || codice_icao || ")" FROM aeroporti ORDER BY nome ASC').fetchall()
 	form: Inizializzazione = Inizializzazione(elencoAeroporti, request.form)
 	if request.method == 'POST' and form.validate():
 		cursore: sqlite3.Cursor = db.cursor()
-		cursore.executemany('UPDATE configurazioni SET valore = ? WHERE nome LIKE ?', [(form.nome.data, 'nome'), (form.cognome.data, 'cognome'), (1, 'inizializzato')])
+		configurazioni.setConfigurazioni({'nome': form.nome.data, 'cognome': form.cognome.data, 'inizializzato': 1})
 		cursore.execute('INSERT INTO aeromobili_posseduti ("id", "id_aeromobile", "aeroporto_attuale", "carburante", "miglia_percorse", "data_acquisto", "data_ultimo_volo") VALUES (1, 1, ?, 212, 0, date(), "")', (form.base.data,))
 		db.commit()
 		return redirect('/')
