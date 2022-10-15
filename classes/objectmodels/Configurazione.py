@@ -11,7 +11,7 @@ class Configurazione:
 		else:
 			sql += 'CAST(valore AS ' + tipo + ') '
 		sql += 'FROM configurazioni WHERE nome LIKE ?'
-		risultato = self.__db.cursor().execute(sql, (nome,)).fetchone()
+		risultato = self.__db.execute(sql, (nome,)).fetchone()
 		if risultato is not None:
 			return risultato[0]
 		return risultato[0] if risultato is not None else risultato
@@ -41,7 +41,6 @@ class Configurazione:
 		return cursore.rowcount >= 1
 	
 	def setConfigurazioni(self, dati: dict) -> None:
-		cursore: sqlite3.Cursor = self.__db.cursor()
 		for nome, valore in dati.items():
 			self.setConfigurazione(nome, valore)
 		self.__db.commit()

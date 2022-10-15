@@ -219,6 +219,19 @@ INSERT INTO `aeroporti` (`id`, `codice_icao`, `nome`, `citta`, `nazione`, `latit
 -- --------------------------------------------------------
 
 --
+-- Struttura della tabella `aeroporti`
+--
+
+CREATE TABLE `metar` (
+  `id_aeroporto` INTEGER NOT NULL PRIMARY KEY,
+  'metar' TEXT NOT NULL,
+  'ultimo_aggiornamento' TEXT NOT NULL,
+  'ultimo_errore' TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
 -- Struttura della tabella `configurazioni`
 --
 
@@ -235,4 +248,5 @@ INSERT INTO `configurazioni` (`nome`, `valore`) VALUES
 ('inizializzato', 0),
 ('nome', ''),
 ('cognome', ''),
-('saldo', 100000);
+('saldo', 100000),
+('intervallo_metar', 5);

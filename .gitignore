@@ -6,3 +6,4 @@ pyvenv.cfg
 personal-va.db
 __pycache__
 *.code-workspace
+/.vscode
