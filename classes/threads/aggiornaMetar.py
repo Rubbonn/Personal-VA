@@ -12,7 +12,7 @@ def aggiornaMetar(shutdownEvent: Event, database: str) -> None:
 	intervallo: int = Configurazione(db).getConfigurazione('intervallo_metar', 'INTEGER')
 	elencoAeroporti: list[Aeroporto] = Aeroporto.getAeroporti(db)
 	elencoAeroporti: list[str] = [aeroporto.codice_icao for aeroporto in elencoAeroporti if len(aeroporto.codice_icao) > 0]
-	while not shutdownEvent.is_set():
+	while True:
 		url = 'https://metar.vatsim.net/' + ','.join(elencoAeroporti)
 		try:
 			with urlopen(url) as risposta:
@@ -31,6 +31,10 @@ def aggiornaMetar(shutdownEvent: Event, database: str) -> None:
 			for metar in Metar.getMetars(db):
 				metar.ultimo_errore = str(e)
 				metar.save()
-		print([(metar.metar, metar.ultimo_aggiornamento.isoformat(' ','seconds'), metar.ultimo_errore) for metar in Metar.getMetars(db)])
-		sleep(intervallo)
+		for i in range(intervallo):
+			if shutdownEvent.is_set():
+				break
+			sleep(1)
+		if shutdownEvent.is_set():
+				break
 	db.close()

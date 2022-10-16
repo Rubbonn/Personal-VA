@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 from distutils.command.config import config
 from threading import Thread
 from flask import Flask, g, redirect, render_template, request
@@ -67,9 +68,10 @@ def inizia():
 	elencoAeroporti: list = [(aeroporto.id, f'{aeroporto.nome} ({aeroporto.codice_icao})') for aeroporto in Aeroporto.getAeroporti(db)]
 	form: Inizializzazione = Inizializzazione(elencoAeroporti, request.form)
 	if request.method == 'POST' and form.validate():
-		configurazioni.setConfigurazioni({'nome': form.nome.data, 'cognome': form.cognome.data, 'inizializzato': 1})
+		configurazioni.setConfigurazioni({'nome': form.nome.data, 'cognome': form.cognome.data, 'inizializzato': 1, 'intervallo_metar': form.intervalloMetar.data * 60})
 		db.execute('INSERT INTO aeromobili_posseduti ("id", "id_aeromobile", "aeroporto_attuale", "carburante", "miglia_percorse", "data_acquisto", "data_ultimo_volo") VALUES (1, 1, ?, 212, 0, date(), "")', (form.base.data,))
 		db.commit()
+		threadManager.restartThreads()
 		return redirect('/')
 	return render_template('pages/inizia.html', form=form)
 

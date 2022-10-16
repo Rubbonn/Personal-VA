@@ -249,4 +249,4 @@ INSERT INTO `configurazioni` (`nome`, `valore`) VALUES
 ('nome', ''),
 ('cognome', ''),
 ('saldo', 100000),
-('intervallo_metar', 5);
+('intervallo_metar', 600);

@@ -3,20 +3,20 @@
 
 {% block content %}
 <h1 class="mt-4">Setup iniziale</h1>
-<p>Per prima cosa, dobbiamo sapere chi sei</p>
-<div class="row justify-content-start">
-	<div class="col-3">
-		<form method="post" action="{{ url_for('inizia') }}">
+<form method="post" action="{{ url_for('inizia') }}">
+	<div class="row justify-content-start">
+		<div class="col-3">
+			<p>Per prima cosa, dobbiamo sapere chi sei</p>
 			<div class="mb-3">
 				<label class="form-label">Nome</label>
-				<input type="text" class="form-control {% if form.nome.errors %}is-invalid{% endif %}" name="nome"/>
+				<input type="text" class="form-control {% if form.nome.errors %}is-invalid{% endif %}" name="nome" {% if form.nome.data is not none %}value="{{ form.nome.data }}"{% endif %}/>
 				{% if form.nome.errors %}
 					<ul class="invalid-feedback">{% for error in form.nome.errors %}<li>{{ error }}</li>{% endfor %}</ul>
 				{% endif %}
 			</div>
 			<div class="mb-3">
 				<label class="form-label">Cognome</label>
-				<input type="text" class="form-control {% if form.cognome.errors %}is-invalid{% endif %}" name="cognome"/>
+				<input type="text" class="form-control {% if form.cognome.errors %}is-invalid{% endif %}" name="cognome" {% if form.cognome.data is not none %}value="{{ form.cognome.data }}"{% endif %}/>
 				{% if form.cognome.errors %}
 					<ul class="invalid-feedback">{% for error in form.cognome.errors %}<li>{{ error }}</li>{% endfor %}</ul>
 				{% endif %}
@@ -26,12 +26,26 @@
 				<select class="form-select {% if form.base.errors %}is-invalid{% endif %}" name="base">
 					<option value=""> - </option>
 					{% for option in form.base.choices %}
-					<option value="{{ option[0] }}">{{ option[1] }}</option>
+					<option value="{{ option[0] }}" {% if form.base.data is not none and option[0] == form.base.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
 					{% endfor %}
 				</select>
 			</div>
-			<button type="submit" class="btn btn-primary">Salva</button>
-		</form>
+		</div>
+		<div class="col-3 border-start">
+			<p>Indica le tempistiche</p>
+			<div class="mb-3">
+				<label class="form-label">Ogni quanti minuti aggiornare i METAR</label>
+				<input type="number" class="form-control {% if form.intervalloMetar.errors %}is-invalid{% endif %}" name="intervalloMetar" {% if form.intervalloMetar.data is not none %}value="{{ form.intervalloMetar.data }}"{% endif %}/>
+				{% if form.intervalloMetar.errors %}
+					<ul class="invalid-feedback">{% for error in form.intervalloMetar.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
+			</div>
+		</div>
 	</div>
-</div>
+	<div class="row">
+		<div class="col">
+			<button type="submit" class="btn btn-primary">Salva</button>
+		</div>
+	</div>
+</form>
 {% endblock %}
