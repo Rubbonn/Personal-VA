@@ -1,9 +1,9 @@
 import sqlite3
 from math import sqrt, pi, sin, cos, atan2
 from classes.objectmodels.Metar import Metar
+from classes.database.database import Database
 
 class Aeroporto:
-	__db: sqlite3.Connection = None
 	id: int | None = None
 	codice_icao: str = ''
 	nome: str = ''
@@ -12,11 +12,11 @@ class Aeroporto:
 	latitudine: float | None = None
 	longitudine: float | None = None
 
-	def __init__(self, db: sqlite3.Connection, id: int = None):
-		self.__db = db
+	def __init__(self, id: int = None):
+		db: sqlite3.Connection = Database()
 		if id is None:
 			return
-		riga: tuple = self.__db.execute('SELECT * FROM aeroporti WHERE id = ?', (id,)).fetchone()
+		riga: tuple = db.execute('SELECT * FROM aeroporti WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return
 		self.id = id
@@ -28,18 +28,20 @@ class Aeroporto:
 		self.longitudine = riga[6]
 	
 	@staticmethod
-	def getAeroporti(db: sqlite3.Connection) -> list['Aeroporto']:
+	def getAeroporti() -> list['Aeroporto']:
+		db: sqlite3.Connection = Database()
 		risultati: list[tuple] = db.execute('SELECT id FROM aeroporti ORDER BY nome ASC').fetchall()
 		if risultati is None:
 			return []
-		return [Aeroporto(db, id[0]) for id in risultati]
+		return [Aeroporto(id[0]) for id in risultati]
 	
 	@staticmethod
-	def getAeroportoByIcao(db: sqlite3.Connection, icao: str) -> 'Aeroporto | None':
+	def getAeroportoByIcao(icao: str) -> 'Aeroporto | None':
+		db: sqlite3.Connection = Database()
 		risultato: tuple = db.execute('SELECT id FROM aeroporti WHERE codice_icao LIKE ?', (icao,)).fetchone()
 		if risultato is None:
 			return None
-		return Aeroporto(db, risultato[0])
+		return Aeroporto(risultato[0])
 	
 	def calcolaDistanza(self, latitudine: float, longitudine: float) -> float:
 		if latitudine < -90 or latitudine > 90 or longitudine < -180 or longitudine > 180:
@@ -53,4 +55,4 @@ class Aeroporto:
 		return d
 	
 	def getMetar(self) -> Metar:
-		return Metar(self.__db, self.id)
+		return Metar(self.id)
