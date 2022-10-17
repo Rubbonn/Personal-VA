@@ -1,9 +1,12 @@
+from datetime import datetime
 from flask import Flask, g, redirect, render_template, request
 import sqlite3
 from os.path import exists
 from classes.forms.Inizializzazione import Inizializzazione
 from classes.objectmodels.Configurazione import Configurazione
 from classes.objectmodels.Aeroporto import Aeroporto
+from classes.objectmodels.Aeromobile import Aeromobile
+from classes.objectmodels.AeromobilePosseduto import AeromobilePosseduto
 import atexit
 from classes.threads.ThreadManager import ThreadManager
 from classes.threads.aggiornaMetar import aggiornaMetar
@@ -37,7 +40,6 @@ def homepage():
 
 @app.route('/inizia', methods=['GET','POST'])
 def inizia():
-	db: sqlite3.Connection = Database()
 	inizializzato: bool = Configurazione.getConfigurazione('inizializzato', 'INTEGER') == 1
 	if inizializzato:
 		return redirect('/')
@@ -45,8 +47,13 @@ def inizia():
 	form: Inizializzazione = Inizializzazione(elencoAeroporti, request.form)
 	if request.method == 'POST' and form.validate():
 		Configurazione.setConfigurazioni({'nome': form.nome.data, 'cognome': form.cognome.data, 'inizializzato': 1, 'intervallo_metar': form.intervalloMetar.data * 60})
-		db.execute('INSERT INTO aeromobili_posseduti ("id", "id_aeromobile", "aeroporto_attuale", "carburante", "miglia_percorse", "data_acquisto", "data_ultimo_volo") VALUES (1, 1, ?, 212, 0, date(), "")', (form.base.data,))
-		db.commit()
+		aereo: AeromobilePosseduto = AeromobilePosseduto()
+		aereo.aeromobile = Aeromobile(1)
+		aereo.aeroporto_attuale = Aeroporto(form.base.data)
+		aereo.carburante = aereo.aeromobile.capacita_serbatoio_l
+		aereo.miglia_percorse = 0
+		aereo.data_acquisto = aereo.data_ultimo_volo = datetime.today()
+		aereo.save()
 		threadManager.restartThreads()
 		return redirect('/')
 	return render_template('pages/inizia.html', form=form)

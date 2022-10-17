@@ -40,8 +40,7 @@ class Configurazione:
 	@staticmethod
 	def setConfigurazione(nome: str, valore: str) -> bool:
 		db: sqlite3.Connection = Database()
-		cursore: sqlite3.Cursor = db.cursor()
-		cursore.execute('UPDATE configurazioni SET valore = ? WHERE nome LIKE ?', (valore, nome))
+		cursore: sqlite3.Cursor = db.execute('UPDATE configurazioni SET valore = ? WHERE nome LIKE ?', (valore, nome))
 		db.commit()
 		return cursore.rowcount >= 1
 	
@@ -49,5 +48,3 @@ class Configurazione:
 	def setConfigurazioni(dati: dict) -> None:
 		for nome, valore in dati.items():
 			Configurazione.setConfigurazione(nome, valore)
-		db: sqlite3.Connection = Database()
-		db.commit()
