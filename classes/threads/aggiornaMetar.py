@@ -8,7 +8,7 @@ from time import sleep
 from datetime import datetime
 from urllib.request import urlopen
 
-def aggiornaMetar(shutdownEvent: Event, database: str) -> None:
+def aggiornaMetar(shutdownEvent: Event) -> None:
 	db: sqlite3.Connection = Database()
 	intervallo: int = Configurazione.getConfigurazione('intervallo_metar', 'INTEGER')
 	elencoAeroporti: list[Aeroporto] = Aeroporto.getAeroporti()

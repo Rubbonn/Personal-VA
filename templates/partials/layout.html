@@ -13,10 +13,11 @@
 		{% block before_head_closing_tag %}
 		<link href="{{ url_for('static', filename='node_modules/startbootstrap-sb-admin/dist/css/styles.css') }}" rel="stylesheet" />
 		<link href="{{ url_for('static', filename='dist/css/styles.css') }}" rel="stylesheet" />
-		<script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}"></script>
 		{% endblock %}
 	</head>
 	<body class="sb-nav-fixed">
+		{% block after_body_opening_tag %}
+		{% endblock %}
 		{% block navbar %}
 		<nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
 			<!-- Navbar Brand-->
@@ -102,6 +103,45 @@
 			<div id="layoutSidenav_content">
 				<main>
 					<div class="container-fluid px-4">
+						{% with messaggi = get_flashed_messages(category_filter=['error']) %}
+							{% if messaggi %}
+							<div class="row pt-4">
+								<div class="col">
+									<ul class="bg-danger text-white rounded p-2">
+										{% for errore in messaggi %}
+											<li>{{ errore }}</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+							{% endif %}
+						{% endwith %}
+						{% with messaggi = get_flashed_messages(category_filter=['success']) %}
+							{% if messaggi %}
+							<div class="row pt-4">
+								<div class="col">
+									<ul class="bg-success text-white rounded p-2">
+										{% for successo in messaggi %}
+											<li>{{ successo }}</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+							{% endif %}
+						{% endwith %}
+						{% with messaggi = get_flashed_messages(category_filter=['info']) %}
+							{% if messaggi %}
+							<div class="row pt-4">
+								<div class="col">
+									<ul class="bg-primary text-white rounded p-2">
+										{% for info in messaggi %}
+											<li>{{ info }}</li>
+										{% endfor %}
+									</ul>
+								</div>
+							</div>
+							{% endif %}
+						{% endwith %}
 						{% block content %}
 						{% endblock %}
 					</div>
@@ -118,8 +158,9 @@
 			</div>
 		</div>
 		{% block before_body_closing_tag %}
-		<script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
-		<script src="{{ url_for('static', filename='node_modules/startbootstrap-sb-admin/dist/js/scripts.js') }}"></script>
+		<script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}" defer></script>
+		<script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}" defer></script>
+		<script src="{{ url_for('static', filename='node_modules/startbootstrap-sb-admin/dist/js/scripts.js') }}" defer></script>
 		{% endblock %}
 	</body>
 </html>

@@ -1,14 +1,10 @@
 from threading import Thread, Event
 class ThreadManager:
-	__database: str = None
 	__shutdownEvent: Event = Event()
 	__threadList: list[dict] = []
-
-	def __init__(self, database: str):
-		self.__database = database
 	
-	def addThread(self, f: callable, start: bool = False, *args, **kwargs) -> None:
-		args = (self.__shutdownEvent, self.__database) + args
+	def addThread(self, f: callable, start: bool = False, *args) -> None:
+		args = (self.__shutdownEvent,) + args
 		self.__threadList.append({'target': f, 'args': args, 'thread': Thread(target=f, args=args, daemon=True)})
 		if start:
 			self.__shutdownEvent.clear()

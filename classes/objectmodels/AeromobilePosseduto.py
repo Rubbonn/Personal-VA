@@ -1,4 +1,3 @@
-from operator import truediv
 import sqlite3
 from classes.database.Database import Database
 from classes.objectmodels.Aeromobile import Aeromobile
@@ -10,9 +9,9 @@ class AeromobilePosseduto:
 	aeroporto: Aeroporto | None = None
 	callsign: str = ''
 	carburante: float | None = None
-	miglia_percorse: float | None = None
-	data_acquisto: datetime | None = None
-	data_ultimo_volo: datetime | None = None
+	migliaPercorse: float | None = None
+	dataAcquisto: datetime | None = None
+	dataUltimoVolo: datetime | None = None
 
 	def __init__(self, id: int = None):
 		db: sqlite3.Connection = Database()
@@ -26,13 +25,13 @@ class AeromobilePosseduto:
 		self.aeroporto = Aeroporto(riga[2])
 		self.callsign = riga[3]
 		self.carburante = riga[4]
-		self.miglia_percorse = riga[5]
-		self.data_acquisto = datetime.fromisoformat(riga[6])
-		self.data_ultimo_volo = datetime.fromisoformat(riga[7])
+		self.migliaPercorse = riga[5]
+		self.dataAcquisto = datetime.fromisoformat(riga[6])
+		self.dataUltimoVolo = datetime.fromisoformat(riga[7])
 	
 	def add(self) -> bool:
 		db: sqlite3.Connection = Database()
-		c: sqlite3.Cursor = db.execute('INSERT INTO aeromobili_posseduti (id_aeromobile, aeroporto, callsign, carburante, miglia_percorse, data_acquisto, data_ultimo_volo) VALUES (?, ?, ?, ?, ?, ?, ?)', (self.aeromobile.id, self.aeroporto.id, self.callsign, self.carburante, self.miglia_percorse, self.data_acquisto.isoformat(' ', 'seconds'), self.data_ultimo_volo.isoformat(' ', 'seconds')))
+		c: sqlite3.Cursor = db.execute('INSERT INTO aeromobili_posseduti (id_aeromobile, aeroporto, callsign, carburante, miglia_percorse, data_acquisto, data_ultimo_volo) VALUES (?, ?, ?, ?, ?, ?, ?)', (self.aeromobile.id, self.aeroporto.id, self.callsign, self.carburante, self.migliaPercorse, self.dataAcquisto.isoformat(' ', 'seconds'), self.dataUltimoVolo.isoformat(' ', 'seconds')))
 		db.commit()
 		if c.rowcount >= 1:
 			self.id = c.lastrowid
@@ -41,7 +40,7 @@ class AeromobilePosseduto:
 	
 	def update(self) -> bool:
 		db: sqlite3.Connection = Database()
-		c: sqlite3.Cursor = db.execute('UPDATE aeromobili_posseduti SET id_aeromobile = ?, aeroporto = ?, callsign = ?, carburante = ?, miglia_percorse = ?, data_acquisto = ?, data_ultimo_volo = ? WHERE id = ?', (self.aeromobile.id, self.aeroporto.id, self.callsign, self.carburante, self.miglia_percorse, self.data_acquisto.isoformat(' ', 'seconds'), self.data_ultimo_volo.isoformat(' ', 'seconds'), self.id))
+		c: sqlite3.Cursor = db.execute('UPDATE aeromobili_posseduti SET id_aeromobile = ?, aeroporto = ?, callsign = ?, carburante = ?, miglia_percorse = ?, data_acquisto = ?, data_ultimo_volo = ? WHERE id = ?', (self.aeromobile.id, self.aeroporto.id, self.callsign, self.carburante, self.migliaPercorse, self.dataAcquisto.isoformat(' ', 'seconds'), self.dataUltimoVolo.isoformat(' ', 'seconds'), self.id))
 		db.commit()
 		return c.rowcount >= 1
 	

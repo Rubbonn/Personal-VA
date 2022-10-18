@@ -1,7 +1,6 @@
 import sqlite3
-from math import sqrt, pi, sin, cos, atan2
-from classes.objectmodels.Metar import Metar
 from classes.database.Database import Database
+from classes.objectmodels.Metar import Metar
 
 class Aeroporto:
 	id: int | None = None
@@ -46,6 +45,7 @@ class Aeroporto:
 	def calcolaDistanza(self, latitudine: float, longitudine: float) -> float:
 		if latitudine < -90 or latitudine > 90 or longitudine < -180 or longitudine > 180:
 			raise Exception('Le coordinate non sono valide')
+		from math import sqrt, pi, sin, cos, atan2
 		R: float = 3440.0647948 # Radius of earth in NM
 		dLat: float = latitudine * pi / 180 - self.latitudine * pi / 180
 		dLon: float = longitudine * pi / 180 - self.longitudine * pi / 180
@@ -56,3 +56,11 @@ class Aeroporto:
 	
 	def getMetar(self) -> Metar:
 		return Metar(self.id)
+	
+	def getAeromobiliPosseduti(self) -> list['AeromobilePosseduto']:
+		db: sqlite3.Connection = Database()
+		risultato: tuple = db.execute('SELECT id FROM aeromobili_posseduti WHERE aeroporto = ?', (self.id,)).fetchall()
+		if risultato is None:
+			return []
+		from classes.objectmodels.AeromobilePosseduto import AeromobilePosseduto
+		return [AeromobilePosseduto(riga[0]) for riga in risultato]

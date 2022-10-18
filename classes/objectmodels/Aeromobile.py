@@ -3,12 +3,12 @@ from classes.database.Database import Database
 class Aeromobile:
 	id: int | None = None
 	nome: str = ''
-	capacita_serbatoio_l: int | None = None
-	consumo_l_h: float | None = None
-	numero_posti: int | None = None
-	velocita_massima_kn: int | None = None
-	velocita_crocera_kn: int | None = None
-	grandezza_stiva_kg: float | None = None
+	capacitaSerbatoioL: int | None = None
+	consumoLH: float | None = None
+	numeroPosti: int | None = None
+	velocitaMassimaKn: int | None = None
+	velocitaCroceraKn: int | None = None
+	grandezzaStivaKg: float | None = None
 	foto: str = ''
 
 	def __init__(self, id: int = None):
@@ -20,12 +20,12 @@ class Aeromobile:
 			return
 		self.id = id
 		self.nome = riga[1]
-		self.capacita_serbatoio_l = riga[2]
-		self.consumo_l_h = riga[3]
-		self.numero_posti = riga[4]
-		self.velocita_massima_kn = riga[5]
-		self.velocita_crocera_kn = riga[6]
-		self.grandezza_stiva_kg = riga[7]
+		self.capacitaSerbatoioL = riga[2]
+		self.consumoLH = riga[3]
+		self.numeroPosti = riga[4]
+		self.velocitaMassimaKn = riga[5]
+		self.velocitaCroceraKn = riga[6]
+		self.grandezzaStivaKg = riga[7]
 		self.foto = riga[8]
 	
 	@staticmethod

@@ -36,15 +36,17 @@
 
 {% block before_body_closing_tag %}
 {{ super() }}
-<script src="{{ url_for('static', filename='node_modules/simple-datatables/dist/umd/simple-datatables.js') }}"></script>
+<script src="{{ url_for('static', filename='node_modules/simple-datatables/dist/umd/simple-datatables.js') }}" defer></script>
 <script type="text/javascript">
-	new simpleDatatables.DataTable(document.getElementById('elencoAeroporti'), {
-		labels: {
-			placeholder: "Cerca...",
-			perPage: "{select} righe per pagina",
-			noRows: "Nessun risultato trovato",
-			info: "Righe da {start} a {end} di {rows} totali",
-		}
+	window.addEventListener('DOMContentLoaded', function() {
+		new simpleDatatables.DataTable(document.getElementById('elencoAeroporti'), {
+			labels: {
+				placeholder: "Cerca...",
+				perPage: "{select} righe per pagina",
+				noRows: "Nessun risultato trovato",
+				info: "Righe da {start} a {end} di {rows} totali",
+			}
+		});
 	});
 </script>
 {% endblock %}
