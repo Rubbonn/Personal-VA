@@ -1,11 +1,11 @@
 import sqlite3
 from math import sqrt, pi, sin, cos, atan2
 from classes.objectmodels.Metar import Metar
-from classes.database.database import Database
+from classes.database.Database import Database
 
 class Aeroporto:
 	id: int | None = None
-	codice_icao: str = ''
+	codiceIcao: str = ''
 	nome: str = ''
 	citta: str = ''
 	nazione: str = ''
@@ -20,7 +20,7 @@ class Aeroporto:
 		if riga is None:
 			return
 		self.id = id
-		self.codice_icao = riga[1]
+		self.codiceIcao = riga[1]
 		self.nome = riga[2]
 		self.citta = riga[3]
 		self.nazione = riga[4]

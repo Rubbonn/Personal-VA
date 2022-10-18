@@ -1,0 +1,7 @@
+{% macro formatDateIt(date) %}
+{{ date.strftime('%d/%m/%Y') }}
+{% endmacro %}
+
+{% macro formatDatetimeIt(date) %}
+{{ date.strftime('%d/%m/%Y %H:%M:%S') }}
+{% endmacro %}

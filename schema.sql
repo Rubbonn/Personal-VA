@@ -32,7 +32,8 @@ INSERT INTO `aeromobili` (`id`, `nome`, `capacita_serbatoio_l`, `consumo_l_h`, `
 CREATE TABLE `aeromobili_posseduti` (
   `id` INTEGER NOT NULL PRIMARY KEY,
   `id_aeromobile` INTEGER NOT NULL,
-  `aeroporto_attuale` INTEGER NOT NULL,
+  `aeroporto` INTEGER NOT NULL,
+  `callsign` TEXT NOT NULL,
   `carburante` REAL NOT NULL,
   `miglia_percorse` REAL NOT NULL,
   `data_acquisto` TEXT NOT NULL,

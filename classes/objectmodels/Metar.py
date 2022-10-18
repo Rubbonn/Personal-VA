@@ -1,12 +1,12 @@
 import sqlite3
 from datetime import datetime
-from classes.database.database import Database
+from classes.database.Database import Database
 
 class Metar:
 	id_aeroporto: int | None = None
 	metar: str = ''
-	ultimo_aggiornamento: datetime | None = None
-	ultimo_errore: str = ''
+	ultimoAggiornamento: datetime | None = None
+	ultimoErrore: str = ''
 
 	def __init__(self, id_aeroporto: int = None):
 		db: sqlite3.Connection = Database()
@@ -17,12 +17,12 @@ class Metar:
 			return
 		self.id_aeroporto = id_aeroporto
 		self.metar = riga[1]
-		self.ultimo_aggiornamento = datetime.fromisoformat(riga[2])
-		self.ultimo_errore = riga[3]
+		self.ultimoAggiornamento = datetime.fromisoformat(riga[2])
+		self.ultimoErrore = riga[3]
 	
 	def save(self):
 		db: sqlite3.Connection = Database()
-		db.execute('INSERT OR REPLACE INTO metar VALUES (?, ?, ?, ?)', (self.id_aeroporto, self.metar, self.ultimo_aggiornamento.isoformat(' ', 'seconds'), self.ultimo_errore))
+		db.execute('INSERT OR REPLACE INTO metar VALUES (?, ?, ?, ?)', (self.id_aeroporto, self.metar, self.ultimoAggiornamento.isoformat(' ', 'seconds'), self.ultimoErrore))
 		db.commit()
 	
 	@staticmethod

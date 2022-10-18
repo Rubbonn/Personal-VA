@@ -13,6 +13,7 @@
   "homepage": "https://github.com/Rubbonn/Personal-VA#readme",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^6.2.0",
+    "simple-datatables": "^3.2.2",
     "startbootstrap-sb-admin": "^7.0.5"
   }
 }

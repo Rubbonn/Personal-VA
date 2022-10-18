@@ -1,0 +1,50 @@
+{% extends 'partials/layout.html' %}
+{% block title %}Aeroporti - Personal Virtual Airline{% endblock %}
+{% block before_head_closing_tag %}
+<link href="{{ url_for('static', filename='node_modules/simple-datatables/dist/style.css') }}" rel="stylesheet" />
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1>Elenco aeroporti registrati</h1>
+<div class="row">
+	<div class="col">
+		<table class="table" id="elencoAeroporti">
+			<thead>
+				<th>Codice ICAO</th>
+				<th>Nome</th>
+				<th>Città</th>
+				<th>METAR</th>
+				<th>Ultimo aggiornamento METAR</th>
+			</thead>
+			<tbody>
+				{% for aeroporto in aeroporti %}
+					{% set metar = aeroporto.getMetar() %}
+					<tr>
+						<td><a href="{{ url_for('aeroporti', idAeroporto=aeroporto.id) }}">{{ aeroporto.codiceIcao }}</a></td>
+						<td>{{ aeroporto.nome }}</td>
+						<td>{{ aeroporto.citta }}</td>
+						<td><a href="https://e6bx.com/weather/{{ aeroporto.codiceIcao }}/?showDecoded=1&focuspoint=metardecoder" target="_blank">{{ metar.metar }}</a></td>
+						<td>{% if metar.ultimoAggiornamento is not none %}{{ formatDatetimeIt(metar.ultimoAggiornamento) }}{% endif %}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
+
+{% block before_body_closing_tag %}
+{{ super() }}
+<script src="{{ url_for('static', filename='node_modules/simple-datatables/dist/umd/simple-datatables.js') }}"></script>
+<script type="text/javascript">
+	new simpleDatatables.DataTable(document.getElementById('elencoAeroporti'), {
+		labels: {
+			placeholder: "Cerca...",
+			perPage: "{select} righe per pagina",
+			noRows: "Nessun risultato trovato",
+			info: "Righe da {start} a {end} di {rows} totali",
+		}
+	});
+</script>
+{% endblock %}

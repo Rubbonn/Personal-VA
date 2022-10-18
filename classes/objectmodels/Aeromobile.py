@@ -1,5 +1,5 @@
 import sqlite3
-from classes.database.database import Database
+from classes.database.Database import Database
 class Aeromobile:
 	id: int | None = None
 	nome: str = ''

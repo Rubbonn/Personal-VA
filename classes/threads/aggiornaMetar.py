@@ -3,7 +3,7 @@ import sqlite3
 from classes.objectmodels.Configurazione import Configurazione
 from classes.objectmodels.Aeroporto import Aeroporto
 from classes.objectmodels.Metar import Metar
-from classes.database.database import Database
+from classes.database.Database import Database
 from time import sleep
 from datetime import datetime
 from urllib.request import urlopen
@@ -12,7 +12,7 @@ def aggiornaMetar(shutdownEvent: Event, database: str) -> None:
 	db: sqlite3.Connection = Database()
 	intervallo: int = Configurazione.getConfigurazione('intervallo_metar', 'INTEGER')
 	elencoAeroporti: list[Aeroporto] = Aeroporto.getAeroporti()
-	elencoAeroporti: list[str] = [aeroporto.codice_icao for aeroporto in elencoAeroporti if len(aeroporto.codice_icao) > 0]
+	elencoAeroporti: list[str] = [aeroporto.codiceIcao for aeroporto in elencoAeroporti if len(aeroporto.codiceIcao) > 0]
 	while True:
 		url = 'https://metar.vatsim.net/' + ','.join(elencoAeroporti)
 		try:
@@ -25,12 +25,12 @@ def aggiornaMetar(shutdownEvent: Event, database: str) -> None:
 					metarObj: Metar = Metar()
 					metarObj.id_aeroporto = aeroporto.id
 					metarObj.metar = metar
-					metarObj.ultimo_aggiornamento = datetime.today()
-					metarObj.ultimo_errore = ''
+					metarObj.ultimoAggiornamento = datetime.today()
+					metarObj.ultimoErrore = ''
 					metarObj.save()
 		except BaseException as e:
 			for metar in Metar.getMetars():
-				metar.ultimo_errore = str(e)
+				metar.ultimoErrore = str(e)
 				metar.save()
 		for i in range(intervallo):
 			if shutdownEvent.is_set():

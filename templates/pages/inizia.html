@@ -32,7 +32,17 @@
 			</div>
 		</div>
 		<div class="col-3 border-start">
-			<p>Indica le tempistiche</p>
+			<p>Informazioni sul tuo primo aeromobile</p>
+			<div class="mb-3">
+				<label class="form-label">CALL-SIGN dell'aereo</label>
+				<input type="text" class="form-control {% if form.callsign.errors %}is-invalid{% endif %}" name="callsign" {% if form.callsign.data is not none %}value="{{ form.callsign.data }}"{% endif %}/>
+				{% if form.callsign.errors %}
+					<ul class="invalid-feedback">{% for error in form.callsign.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
+			</div>
+		</div>
+		<div class="col-3 border-start">
+			<p>Indica le tempistiche delle attività parallele</p>
 			<div class="mb-3">
 				<label class="form-label">Ogni quanti minuti aggiornare i METAR</label>
 				<input type="number" class="form-control {% if form.intervalloMetar.errors %}is-invalid{% endif %}" name="intervalloMetar" {% if form.intervalloMetar.data is not none %}value="{{ form.intervalloMetar.data }}"{% endif %}/>

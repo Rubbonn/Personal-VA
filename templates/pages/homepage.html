@@ -2,5 +2,38 @@
 {% block title %}Personal Virtual Airline{% endblock %}
 
 {% block content %}
-Hello World
+<h1>Bentornato {{ utente.nome }}</h1>
+<div class="row">
+	<div class="col">
+		<div class="card border-success">
+			<div class="card-body">
+				<h5 class="card-title">Saldo attuale</h5>
+				<p class="card-text">{{ utente.getSaldoFormattato() }}</p>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card">
+			<div class="card-body">
+				<h5 class="card-title">Aeromobili in possesso</h5>
+				<table class="table">
+					<thead>
+						<th>CALL-SIGN</th>
+						<th>Aeroporto</th>
+						<th>Carburante rimasto</th>
+					</thead>
+					<tbody>
+						{% for aereo in aerei %}
+							<tr>
+								<td>{{ aereo.callsign }}</td>
+								<td>{{ aereo.aeroporto.nome }}</td>
+								<td>{{ aereo.getFormattedCarburante() }}</td>
+							</tr>
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
 {% endblock %}

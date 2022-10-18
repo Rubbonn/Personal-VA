@@ -1,13 +1,16 @@
+{% from 'partials/macro.html' import formatDateIt, formatDatetimeIt %}
 <!DOCTYPE html>
 <html lang="it">
 	<head>
-		{% block head %}
+		{% block after_head_opening_tag %}
+		{% endblock %}
 		<meta charset="utf-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 		<meta name="description" content="" />
 		<meta name="author" content="" />
 		<title>{% block title %}{% endblock %}</title>
+		{% block before_head_closing_tag %}
 		<link href="{{ url_for('static', filename='node_modules/startbootstrap-sb-admin/dist/css/styles.css') }}" rel="stylesheet" />
 		<link href="{{ url_for('static', filename='dist/css/styles.css') }}" rel="stylesheet" />
 		<script src="{{ url_for('static', filename='node_modules/@fortawesome/fontawesome-free/js/all.min.js') }}"></script>
@@ -32,6 +35,10 @@
 							<a class="nav-link" href="{{ url_for('homepage') }}">
 								<div class="sb-nav-link-icon"><i class="fas fa-home-alt"></i></div>
 								Homepage
+							</a>
+							<a class="nav-link" href="{{ url_for('aeroporti') }}">
+								<div class="sb-nav-link-icon"><i class="fas fa-plane-departure"></i></div>
+								Aeroporti
 							</a>
 							<div class="sb-sidenav-menu-heading">Interface</div>
 							<a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
@@ -103,14 +110,16 @@
 					<div class="container-fluid px-4">
 						{% block footer %}
 						<div class="d-flex align-items-center justify-content-between small">
-							<div class="text-muted">Made by Rubbonn</div>
+							<div class="text-muted"><a href="https://github.com/Rubbonn/Personal-VA" target="_blank">Made by Rubbonn</a></div>
 						</div>
 						{% endblock %}
 					</div>
 				</footer>
 			</div>
 		</div>
+		{% block before_body_closing_tag %}
 		<script src="{{ url_for('static', filename='node_modules/bootstrap/dist/js/bootstrap.bundle.min.js') }}"></script>
 		<script src="{{ url_for('static', filename='node_modules/startbootstrap-sb-admin/dist/js/scripts.js') }}"></script>
+		{% endblock %}
 	</body>
 </html>
