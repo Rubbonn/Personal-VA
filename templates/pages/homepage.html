@@ -25,7 +25,7 @@
 					<tbody>
 						{% for aereo in aerei %}
 							<tr>
-								<td>{{ aereo.callsign }}</td>
+								<td><a href="{{ url_for('aeromobiliPosseduti', idAeromobilePosseduto=aereo.id) }}">{{ aereo.callsign }}</a></td>
 								<td><a href="{{ url_for('aeroporti', idAeroporto=aereo.aeroporto.id) }}">{{ aereo.aeroporto.nome }} ({{ aereo.aeroporto.codiceIcao }})</a></td>
 								<td>{{ aereo.getFormattedCarburante() }}</td>
 							</tr>

@@ -28,6 +28,12 @@ class Aeromobile:
 		self.grandezzaStivaKg = riga[7]
 		self.foto = riga[8]
 	
+	def getFormattedConsumoLH(self) -> str:
+		return f'{self.consumoLH:,.2f} L/H'
+	
+	def getFormattedGrandezzaStivaKg(self) -> str:
+		return f'{self.grandezzaStivaKg:,.2f} Kg'
+	
 	@staticmethod
 	def getAeromobili() -> list['Aeromobile']:
 		db: sqlite3.Connection = Database()

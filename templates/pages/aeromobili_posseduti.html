@@ -1,0 +1,53 @@
+{% extends 'partials/layout.html' %}
+{% block title %}Aeromobili posseduti - Personal Virtual Airline{% endblock %}
+{% block before_head_closing_tag %}
+<link href="{{ url_for('static', filename='node_modules/simple-datatables/dist/style.css') }}" rel="stylesheet" />
+{{ super() }}
+{% endblock %}
+
+{% block content %}
+<h1>Elenco aeromobili posseduti</h1>
+<div class="row">
+	<div class="col">
+		<table class="table" id="elencoAeromobiliPosseduti">
+			<thead>
+				<th>CALLSIGN</th>
+				<th>Foto</th>
+				<th>Tipo</th>
+				<th>Miglia percorse</th>
+				<th>Ultimo volo</th>
+				<th>Posizione attuale</th>
+			</thead>
+			<tbody>
+				{% for aeromobilePosseduto in aeromobiliPosseduti %}
+					<tr>
+						<td><a href="{{ url_for('aeromobiliPosseduti', idAeromobilePosseduto=aeromobilePosseduto.id) }}">{{ aeromobilePosseduto.callsign }}</a></td>
+						<td><img class="img-fluid" style="max-width:200px;" src="{{ url_for('static', filename='foto/'+aeromobilePosseduto.aeromobile.foto) }}"/></td>
+						<td>{{ aeromobilePosseduto.aeromobile.nome }}</td>
+						<td>{{ aeromobilePosseduto.getFormattedMigliaPercorse() }}</td>
+						<td>{{ formatDateIt(aeromobilePosseduto.dataUltimoVolo) }}</td>
+						<td><a href="{{ url_for('aeroporti', idAeroporto=aeromobilePosseduto.aeroporto.id) }}">{{ aeromobilePosseduto.aeroporto.codiceIcao }}</a></td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+	</div>
+</div>
+{% endblock %}
+
+{% block before_body_closing_tag %}
+{{ super() }}
+<script src="{{ url_for('static', filename='node_modules/simple-datatables/dist/umd/simple-datatables.js') }}" defer></script>
+<script type="text/javascript">
+	window.addEventListener('DOMContentLoaded', function() {
+		new simpleDatatables.DataTable(document.getElementById('elencoAeromobiliPosseduti'), {
+			labels: {
+				placeholder: "Cerca...",
+				perPage: "{select} righe per pagina",
+				noRows: "Nessun risultato trovato",
+				info: "Righe da {start} a {end} di {rows} totali",
+			}
+		});
+	});
+</script>
+{% endblock %}

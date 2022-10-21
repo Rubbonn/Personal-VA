@@ -1,0 +1,72 @@
+{% extends 'partials/layout.html' %}
+{% block title %}aeromobile posseduto - Personal Virtual Airline{% endblock %}
+{% block before_head_closing_tag %}
+{{ super() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+{% endblock %}
+
+{% block content %}
+<h1>Dettagli dell'aeromobile {{ aeromobilePosseduto.callsign }}</h1>
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">Informazioni aeromobile</div>
+			<div class="card-body">
+				<ul>
+					<li>Carburante rimasto: {{ aeromobilePosseduto.getFormattedCarburante() }}</li>
+					<li>Totale miglia percorse: {{ aeromobilePosseduto.getFormattedMigliaPercorse() }}</li>
+					<li>Data ultimo volo: {{ formatDateIt(aeromobilePosseduto.dataUltimoVolo) }}</li>
+					<li>Data di acquisto: {{ formatDateIt(aeromobilePosseduto.dataAcquisto) }}</li>
+				</ul>
+			</div>
+		</div>
+		<div class="card mt-3">
+			<div class="card-header">Informazioni generali</div>
+			<div class="card-body">
+				<ul>
+					<li>Tipo: {{ aeromobilePosseduto.aeromobile.nome }}</li>
+					<li>Capacità massima serbatoio: {{ aeromobilePosseduto.aeromobile.capacitaSerbatoioL }} L</li>
+					<li>Consumo carburante: {{ aeromobilePosseduto.aeromobile.getFormattedConsumoLH() }}</li>
+					<li>Posti a sedere: {{ aeromobilePosseduto.aeromobile.numeroPosti }}</li>
+					<li>Velocità massima: {{ aeromobilePosseduto.aeromobile.velocitaMassimaKn }} Kn</li>
+					<li>Velocità di crociera: {{ aeromobilePosseduto.aeromobile.velocitaCroceraKn }} Kn</li>
+					<li>Capacità stiva: {{ aeromobilePosseduto.aeromobile.getFormattedGrandezzaStivaKg() }}</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="card">
+			<div class="card-header">Posizione attuale</div>
+			<div class="card-body">
+				<div id="mappa" style="height:500px"></div>
+			</div>
+		</div>
+		<div class="card mt-3">
+			<div class="card-header">Fotografia</div>
+			<div class="card-body">
+				<img class="img-fluid" src="{{ url_for('static', filename='foto/'+aeromobilePosseduto.aeromobile.foto) }}"/>
+			</div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block before_body_closing_tag %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin="" defer></script>
+<script type="text/javascript">
+	window.addEventListener('DOMContentLoaded', function() {
+		let mappa = document.getElementById('mappa');
+		if(typeof L === 'undefined') {
+			mappa.innerHTML = '<p>Oops, sembra che tu non sia connesso ad internet. Impossibile visualizzare la mappa.</p>';
+			return;
+		}
+		mappa = L.map(mappa).setView([{{ aeromobilePosseduto.aeroporto.latitudine }}, {{ aeromobilePosseduto.aeroporto.longitudine }}], 13);
+		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+			maxZoom: 19,
+			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+		}).addTo(mappa);
+	});
+</script>
+{% endblock %}

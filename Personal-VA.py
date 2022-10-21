@@ -67,11 +67,21 @@ def inizia():
 def aeroporti(idAeroporto: int | None = None):
 	if idAeroporto is None:
 		return render_template('pages/aeroporti.html', aeroporti=Aeroporto.getAeroporti())
-	else:
-		aeroporto: Aeroporto = Aeroporto(idAeroporto)
-		if(aeroporto.id is None):
-			flash('Id aeroporto non trovato', 'error')
-			return redirect(url_for('aeroporti'))
-		return render_template('pages/aeroporto.html', aeroporto=Aeroporto(idAeroporto))
+	aeroporto: Aeroporto = Aeroporto(idAeroporto)
+	if aeroporto.id is None:
+		flash('Id aeroporto non trovato', 'error')
+		return redirect(url_for('aeroporti'))
+	return render_template('pages/aeroporto.html', aeroporto=Aeroporto(idAeroporto))
+
+@app.route('/aeromobili-posseduti', defaults={'idAeromobilePosseduto': None})
+@app.route('/aeromobili-posseduti/<int:idAeromobilePosseduto>')
+def aeromobiliPosseduti(idAeromobilePosseduto: int | None = None):
+	if idAeromobilePosseduto is None:
+		return render_template('pages/aeromobili_posseduti.html', aeromobiliPosseduti=AeromobilePosseduto.getAeromobiliPosseduti())
+	aeromobilePosseduto: AeromobilePosseduto = AeromobilePosseduto(idAeromobilePosseduto)
+	if aeromobilePosseduto.id is None:
+		flash('Aeromobile posseduto non trovato', 'error')
+		return redirect(url_for('aeromobiliPosseduti'))
+	return render_template('pages/aeromobile_posseduto.html', aeromobilePosseduto=aeromobilePosseduto)
 
 app.run('0.0.0.0', 80, debug=True, use_reloader=False)

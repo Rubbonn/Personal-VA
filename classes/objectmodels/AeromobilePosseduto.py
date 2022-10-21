@@ -52,6 +52,9 @@ class AeromobilePosseduto:
 	def getFormattedCarburante(self) -> str:
 		return f'{self.carburante:,.2f} L'
 	
+	def getFormattedMigliaPercorse(self) -> str:
+		return f'{self.migliaPercorse:,.2f} NM'
+	
 	@staticmethod
 	def getAeromobiliPosseduti() -> list['AeromobilePosseduto']:
 		db: sqlite3.Connection = Database()
