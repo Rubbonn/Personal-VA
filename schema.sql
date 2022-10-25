@@ -286,3 +286,15 @@ CREATE TABLE `transazioni` (
   `valore` REAL NOT NULL,
   `data` TEXT NOT NULL
 );
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `cache`
+--
+
+CREATE TABLE `cache` (
+  `chiave` TEXT NOT NULL PRIMARY KEY,
+  `valore` BLOB NOT NULL,
+  `scadenza` TEXT NOT NULL
+);
