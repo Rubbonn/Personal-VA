@@ -1,4 +1,3 @@
-from concurrent.futures import thread
 import sqlite3
 import atexit
 from secrets import token_hex

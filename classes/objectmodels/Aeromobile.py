@@ -2,6 +2,7 @@ import sqlite3
 from classes.database.Database import Database
 class Aeromobile:
 	id: int | None = None
+	idCarburante: int | None = None
 	nome: str = ''
 	capacitaSerbatoioL: int | None = None
 	consumoLH: float | None = None
@@ -19,20 +20,25 @@ class Aeromobile:
 		if riga is None:
 			return
 		self.id = id
-		self.nome = riga[1]
-		self.capacitaSerbatoioL = riga[2]
-		self.consumoLH = riga[3]
-		self.numeroPosti = riga[4]
-		self.velocitaMassimaKn = riga[5]
-		self.velocitaCroceraKn = riga[6]
-		self.grandezzaStivaKg = riga[7]
-		self.foto = riga[8]
+		self.idCarburante = riga[1]
+		self.nome = riga[2]
+		self.capacitaSerbatoioL = riga[3]
+		self.consumoLH = riga[4]
+		self.numeroPosti = riga[5]
+		self.velocitaMassimaKn = riga[6]
+		self.velocitaCroceraKn = riga[7]
+		self.grandezzaStivaKg = riga[8]
+		self.foto = riga[9]
 	
 	def getFormattedConsumoLH(self) -> str:
 		return f'{self.consumoLH:,.2f} L/H'
 	
 	def getFormattedGrandezzaStivaKg(self) -> str:
 		return f'{self.grandezzaStivaKg:,.2f} Kg'
+	
+	def getNomeCarburante(self) -> str:
+		db: sqlite3.Connection = Database()
+		return db.execute('SELECT nome FROM carburanti WHERE id = ?', (self.idCarburante,)).fetchone()[0]
 	
 	@staticmethod
 	def getAeromobili() -> list['Aeromobile']:

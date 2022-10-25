@@ -6,6 +6,7 @@
 
 CREATE TABLE `aeromobili` (
   `id` INTEGER NOT NULL PRIMARY KEY,
+  `id_carburante` INTEGER NOT NULL,
   `nome` TEXT NOT NULL,
   `capacita_serbatoio_l` INTEGER NOT NULL,
   `consumo_l_h` REAL NOT NULL,
@@ -20,8 +21,28 @@ CREATE TABLE `aeromobili` (
 -- Dump dei dati per la tabella `aeromobili`
 --
 
-INSERT INTO `aeromobili` (`id`, `nome`, `capacita_serbatoio_l`, `consumo_l_h`, `numero_posti`, `velocita_massima_kn`, `velocita_crocera_kn`, `grandezza_stiva_kg`, `foto`) VALUES
-(1, 'Cessna C172', 212, '35.961395', 2, 145, 100, '54.43', 'cessna-c172.webp');
+INSERT INTO `aeromobili` (`id`, `id_carburante`, `nome`, `capacita_serbatoio_l`, `consumo_l_h`, `numero_posti`, `velocita_massima_kn`, `velocita_crocera_kn`, `grandezza_stiva_kg`, `foto`) VALUES
+(1, 1, 'Cessna C172', 212, '35.961395', 2, 145, 100, '54.43', 'cessna-c172.webp');
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `carburanti`
+--
+
+CREATE TABLE `carburanti` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `nome` TEXT NOT NULL,
+  `prezzo_base` REAL NOT NULL
+);
+
+--
+-- Dump dei dati per la tabella `carburanti`
+--
+
+INSERT INTO `carburanti` (`id`, `nome`, `prezzo_base`) VALUES
+(1, 'AVGAS 100LL', 2.43),
+(2, 'JET A-1', 1.52);
 
 -- --------------------------------------------------------
 
@@ -250,7 +271,8 @@ INSERT INTO `configurazioni` (`nome`, `valore`) VALUES
 ('nome', ''),
 ('cognome', ''),
 ('saldo', 100000),
-('intervallo_metar', 600);
+('intervallo_metar', 600),
+('avfuel_com_api_key', '');
 
 -- --------------------------------------------------------
 
