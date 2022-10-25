@@ -44,6 +44,13 @@ class ThreadManager:
 		for i, t in enumerate(self.__threadList):
 			self.stopThread(i)
 	
+	def restartThread(self, indice: int):
+		if indice < 0 or indice >= len(self.__threadList):
+			return
+		if self.__threadList[indice]['thread'].is_alive():
+			self.stopThread(indice)
+		self.startThread(indice)
+	
 	def restartThreads(self) -> None:
 		self.stopThreads()
 		for t in self.__threadList:

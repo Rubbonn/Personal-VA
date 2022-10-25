@@ -1,0 +1,25 @@
+{% extends 'partials/layout.html' %}
+{% block title %}Impostazioni - Personal Virtual Airline{% endblock %}
+
+{% block content %}
+<h1 class="mt-4">Impostazioni del sistema</h1>
+<form method="post" action="{{ url_for('impostazioni') }}">
+	<div class="row justify-content-start">
+		<div class="col-3">
+			<h5>Indica le tempistiche delle attività parallele</h5>
+			<div class="mb-3">
+				<label class="form-label">Ogni quanti minuti aggiornare i METAR</label>
+				<input type="number" class="form-control {% if form.intervalloMetar.errors %}is-invalid{% endif %}" name="intervalloMetar" value="{% if form.intervalloMetar.data is not none %}{{ form.intervalloMetar.data }}{% else %}{{ configurazioni.intervallo_metar }}{% endif %}"/>
+				{% if form.intervalloMetar.errors %}
+					<ul class="invalid-feedback">{% for error in form.intervalloMetar.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col">
+			<button type="submit" class="btn btn-primary">Salva</button>
+		</div>
+	</div>
+</form>
+{% endblock %}

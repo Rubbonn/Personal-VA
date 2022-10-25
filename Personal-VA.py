@@ -1,3 +1,4 @@
+from concurrent.futures import thread
 import sqlite3
 import atexit
 from secrets import token_hex
@@ -29,7 +30,7 @@ if not exists(database):
 
 threadManager: ThreadManager = ThreadManager()
 atexit.register(threadManager.stopThreads)
-threadManager.addThread(aggiornaMetar)
+aggiornaMetarThreadIndice: int = threadManager.addThread(aggiornaMetar)
 threadManager.startThreads()
 
 # Definizione funzioni web
@@ -50,7 +51,7 @@ def inizia():
 	from classes.forms.Inizializzazione import Inizializzazione
 	form: Inizializzazione = Inizializzazione(elencoAeroporti, request.form)
 	if request.method == 'POST' and form.validate():
-		Configurazione.setConfigurazioni({'nome': form.nome.data, 'cognome': form.cognome.data, 'inizializzato': 1, 'intervallo_metar': form.intervalloMetar.data * 60})
+		Configurazione.setConfigurazioni({'nome': form.nome.data, 'cognome': form.cognome.data, 'inizializzato': 1, 'intervallo_metar': form.intervalloMetar.data})
 		aereo: AeromobilePosseduto = AeromobilePosseduto()
 		aereo.aeromobile = Aeromobile(1)
 		aereo.aeroporto = Aeroporto(form.base.data)
@@ -89,5 +90,14 @@ def aeromobiliPosseduti(idAeromobilePosseduto: int | None = None):
 		flash('Aeromobile posseduto non trovato', 'error')
 		return redirect(url_for('aeromobiliPosseduti'))
 	return render_template('pages/aeromobile_posseduto.html', aeromobilePosseduto=aeromobilePosseduto)
+
+@app.route('/impostazioni', methods=['GET','POST'])
+def impostazioni():
+	from classes.forms.Impostazioni import Impostazioni
+	form: Impostazioni = Impostazioni(request.form)
+	if request.method == 'POST' and form.validate():
+		Configurazione.setConfigurazioni({'intervallo_metar': form.intervalloMetar.data})
+		threadManager.restartThread(aggiornaMetarThreadIndice)
+	return render_template('pages/impostazioni.html', form=form, configurazioni=Configurazione.getAllConfigurazioni())
 
 app.run('0.0.0.0', 80, debug=True, use_reloader=False)

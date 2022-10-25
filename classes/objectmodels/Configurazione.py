@@ -48,3 +48,11 @@ class Configurazione:
 	def setConfigurazioni(dati: dict) -> None:
 		for nome, valore in dati.items():
 			Configurazione.setConfigurazione(nome, valore)
+	
+	@staticmethod
+	def getAllConfigurazioni() -> dict:
+		db: sqlite3.Connection = Database()
+		risultati: dict = {}
+		for configurazione in db.execute('SELECT nome, valore FROM configurazioni').fetchall():
+			risultati[configurazione[0]] = configurazione[1]
+		return risultati

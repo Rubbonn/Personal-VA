@@ -10,7 +10,7 @@ from urllib.request import urlopen
 
 def aggiornaMetar(shutdownEvent: Event) -> None:
 	db: sqlite3.Connection = Database()
-	intervallo: int = Configurazione.getConfigurazione('intervallo_metar', 'INTEGER')
+	intervallo: int = Configurazione.getConfigurazione('intervallo_metar', 'INTEGER') * 60
 	elencoAeroporti: list[Aeroporto] = Aeroporto.getAeroporti()
 	elencoAeroporti: list[str] = [aeroporto.codiceIcao for aeroporto in elencoAeroporti if len(aeroporto.codiceIcao) > 0]
 	while True:
