@@ -9,6 +9,25 @@
 			<div class="card-body">
 				<h5 class="card-title">Saldo attuale</h5>
 				<p class="card-text">{{ utente.getSaldoFormattato() }}</p>
+				<h5 class="card-title">Ultime 10 transazioni</h5>
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Data</th>
+							<th>Causale</th>
+							<th>Valore</th>
+						</tr>
+					</thead>
+					<tbody>
+						{% for transazione in ultimeTransazioni %}
+						<tr>
+							<td>{{ formatDateTimeIt(transazione.data) }}</td>
+							<td>{{ transazione.causale }}</td>
+							<td>{{ transazione.getFormattedValore() }}</td>
+						</tr>
+						{% endfor %}
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
@@ -18,17 +37,19 @@
 				<h5 class="card-title">Aeromobili in possesso</h5>
 				<table class="table">
 					<thead>
-						<th>CALL-SIGN</th>
-						<th>Aeroporto</th>
-						<th>Carburante rimasto</th>
+						<tr>
+							<th>CALL-SIGN</th>
+							<th>Aeroporto</th>
+							<th>Carburante rimasto</th>
+						</tr>
 					</thead>
 					<tbody>
 						{% for aereo in aerei %}
-							<tr>
-								<td><a href="{{ url_for('aeromobiliPosseduti', idAeromobilePosseduto=aereo.id) }}">{{ aereo.callsign }}</a></td>
-								<td><a href="{{ url_for('aeroporti', idAeroporto=aereo.aeroporto.id) }}">{{ aereo.aeroporto.nome }} ({{ aereo.aeroporto.codiceIcao }})</a></td>
-								<td>{{ aereo.getFormattedCarburante() }}</td>
-							</tr>
+						<tr>
+							<td><a href="{{ url_for('aeromobiliPosseduti', idAeromobilePosseduto=aereo.id) }}">{{ aereo.callsign }}</a></td>
+							<td><a href="{{ url_for('aeroporti', idAeroporto=aereo.aeroporto.id) }}">{{ aereo.aeroporto.nome }} ({{ aereo.aeroporto.codiceIcao }})</a></td>
+							<td>{{ aereo.getFormattedCarburante() }}</td>
+						</tr>
 						{% endfor %}
 					</tbody>
 				</table>

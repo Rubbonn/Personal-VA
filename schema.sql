@@ -251,3 +251,16 @@ INSERT INTO `configurazioni` (`nome`, `valore`) VALUES
 ('cognome', ''),
 ('saldo', 100000),
 ('intervallo_metar', 600);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `transazioni`
+--
+
+CREATE TABLE `transazioni` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `causale` TEXT NOT NULL,
+  `valore` REAL NOT NULL,
+  `data` TEXT NOT NULL
+);

@@ -22,7 +22,7 @@
 					<li>Longitudine: {{ aeroporto.longitudine }}</li>
 					{% if metar.ultimoAggiornamento is not none %}
 					<li>Metar: <a href="https://e6bx.com/weather/{{ aeroporto.codiceIcao }}/?showDecoded=1&focuspoint=metardecoder" target="_blank">{{ metar.metar }}</a></li>
-					<li>Ultimo aggiornamento: {{ formatDatetimeIt(metar.ultimoAggiornamento) }}</li>
+					<li>Ultimo aggiornamento: {{ formatDateTimeIt(metar.ultimoAggiornamento) }}</li>
 					{% endif %}
 				</ul>
 			</div>

@@ -9,6 +9,7 @@ from classes.objectmodels.Aeroporto import Aeroporto
 from classes.objectmodels.Aeromobile import Aeromobile
 from classes.objectmodels.AeromobilePosseduto import AeromobilePosseduto
 from classes.objectmodels.Utente import Utente
+from classes.objectmodels.Transazione import Transazione
 from classes.threads.ThreadManager import ThreadManager
 from classes.threads.aggiornaMetar import aggiornaMetar
 from classes.database.Database import Database
@@ -38,7 +39,7 @@ def homepage():
 	inizializzato: bool = Configurazione.getConfigurazione('inizializzato', 'INTEGER') == 1
 	if not inizializzato:
 		return redirect(url_for('inizia'))
-	return render_template('pages/homepage.html', utente=Utente(), aerei=AeromobilePosseduto.getAeromobiliPosseduti())
+	return render_template('pages/homepage.html', utente=Utente(), aerei=AeromobilePosseduto.getAeromobiliPosseduti(), ultimeTransazioni=Transazione.getTransazioni()[:10])
 
 @app.route('/inizia', methods=['GET','POST'])
 def inizia():
@@ -58,6 +59,11 @@ def inizia():
 		aereo.migliaPercorse = 0
 		aereo.dataAcquisto = aereo.dataUltimoVolo = datetime.today()
 		aereo.save()
+		trans: Transazione = Transazione()
+		trans.causale = 'Importo iniziale'
+		trans.valore = 100000
+		trans.data = datetime.today()
+		trans.save()
 		threadManager.restartThreads()
 		return redirect(url_for('homepage'))
 	return render_template('pages/inizia.html', form=form)

@@ -11,11 +11,13 @@
 	<div class="col">
 		<table class="table" id="elencoAeroporti">
 			<thead>
-				<th>Codice ICAO</th>
-				<th>Nome</th>
-				<th>Città</th>
-				<th>METAR</th>
-				<th>Ultimo aggiornamento METAR</th>
+				<tr>
+					<th>Codice ICAO</th>
+					<th>Nome</th>
+					<th>Città</th>
+					<th>METAR</th>
+					<th>Ultimo aggiornamento METAR</th>
+				</tr>
 			</thead>
 			<tbody>
 				{% for aeroporto in aeroporti %}
@@ -25,7 +27,7 @@
 						<td>{{ aeroporto.nome }}</td>
 						<td>{{ aeroporto.citta }}</td>
 						<td><a href="https://e6bx.com/weather/{{ aeroporto.codiceIcao }}/?showDecoded=1&focuspoint=metardecoder" target="_blank">{{ metar.metar }}</a></td>
-						<td>{% if metar.ultimoAggiornamento is not none %}{{ formatDatetimeIt(metar.ultimoAggiornamento) }}{% endif %}</td>
+						<td>{% if metar.ultimoAggiornamento is not none %}{{ formatDateTimeIt(metar.ultimoAggiornamento) }}{% endif %}</td>
 					</tr>
 				{% endfor %}
 			</tbody>
