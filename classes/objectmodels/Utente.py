@@ -1,10 +1,10 @@
+from classes.objectmodels.Configurazione import Configurazione
 class Utente:
 	nome: str = ''
 	cognome: str = ''
 	saldo: float | None = None
 
 	def __init__(self):
-		from classes.objectmodels.Configurazione import Configurazione
 		dati: dict = Configurazione.getConfigurazioni(['nome', 'cognome', 'saldo'], ['TEXT', 'TEXT', 'REAL'])
 		self.nome = dati['nome']
 		self.cognome = dati['cognome']
@@ -12,3 +12,9 @@ class Utente:
 	
 	def getSaldoFormattato(self) -> str:
 		return f'{self.saldo:,.2f} €'
+	
+	@staticmethod
+	def aggiornaSaldo(delta: float = 0):
+		saldo: float = Configurazione.getConfigurazione('saldo', 'REAL')
+		saldo += delta
+		Configurazione.setConfigurazione('saldo', saldo)

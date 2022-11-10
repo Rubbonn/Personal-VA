@@ -1,7 +1,7 @@
 import sqlite3
 import atexit
 from secrets import token_hex
-from flask import Flask, redirect, render_template, request, flash, url_for
+from flask import Flask, redirect, render_template, request, flash, url_for, jsonify
 from os.path import exists
 from datetime import datetime
 from classes.objectmodels.Configurazione import Configurazione
@@ -13,6 +13,7 @@ from classes.objectmodels.Transazione import Transazione
 from classes.threads.ThreadManager import ThreadManager
 from classes.threads.aggiornaMetar import aggiornaMetar
 from classes.database.Database import Database
+from classes.provider.PrezziCarburanteProvider import PrezziCarburanteProvider
 
 # Inizializzazione sistema
 
@@ -98,5 +99,39 @@ def impostazioni():
 		Configurazione.setConfigurazioni({'intervallo_metar': form.intervalloMetar.data})
 		threadManager.restartThread(aggiornaMetarThreadIndice)
 	return render_template('pages/impostazioni.html', form=form, configurazioni=Configurazione.getAllConfigurazioni())
+
+@app.route('/ajax/getPrezzoCarburante/<int:idAeroporto>/<int:idCarburante>')
+def getPrezzoCarburante(idAeroporto:int, idCarburante:int):
+	return jsonify(PrezziCarburanteProvider().getPrezzoCarburante(idAeroporto, idCarburante))
+
+@app.route('/ajax/rifornisciAereo', methods=['POST'])
+def rifornisciAereo():
+	try:
+		idAeromobilePosseduto: int = request.form.get('idAeromobilePosseduto', None, int)
+		aeromobilePosseduto: AeromobilePosseduto = AeromobilePosseduto(idAeromobilePosseduto)
+		if idAeromobilePosseduto is None or aeromobilePosseduto.id is None:
+			raise Exception()
+	except:
+		return jsonify({'stato': False, 'errore': 'Id aeromobile posseduto sbagliato'})
+	try:
+		volume: float = request.form.get('volume', None, float)
+		if volume is None or volume <= 0:
+			raise Exception()
+	except:
+		return jsonify({'stato': False, 'errore': 'Volume carburante sbagliato'})
+	if volume > aeromobilePosseduto.aeromobile.capacitaSerbatoioL - aeromobilePosseduto.carburante:
+		return jsonify({'stato': False, 'errore': 'Volume carburante oltre il massimo rifornibile'})
+	costoCarburante: float = PrezziCarburanteProvider().getPrezzoCarburante(aeromobilePosseduto.aeroporto.id, aeromobilePosseduto.aeromobile.idCarburante)
+	if costoCarburante * volume > Utente().saldo:
+		return jsonify({'stato': False, 'errore': 'Non hai abbastanza soldi'})
+	aeromobilePosseduto.carburante += volume
+	aeromobilePosseduto.save()
+	transazione: Transazione = Transazione()
+	transazione.causale = f'Rifornimento carburante aeromobile {aeromobilePosseduto.callsign} di {volume}L'
+	transazione.valore = round(costoCarburante * volume, 2)
+	transazione.data = datetime.today()
+	transazione.save()
+	Utente.aggiornaSaldo(-transazione.valore)
+	return jsonify({'stato': True})
 
 app.run('0.0.0.0', 80, debug=True, use_reloader=False)

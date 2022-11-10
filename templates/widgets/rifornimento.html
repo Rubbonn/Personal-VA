@@ -1,0 +1,111 @@
+<button type="button" class="rifornimento-trigger {% if classiBottone is defined %}{{ classiBottone }}{% else %}btn btn-primary{% endif %}" data-bs-toggle="modal" data-bs-target="#rifornimento-modal" data-id-aeromobile-posseduto="{{ aeromobilePosseduto.id }}" data-id-aeroporto="{{ aeromobilePosseduto.aeroporto.id }}" data-id-carburante="{{ aeromobilePosseduto.aeromobile.idCarburante }}">Fai rifornimento</button>
+<template id="template-rifornimento-modal">
+	<div class="modal fade" tabindex="-1" id="rifornimento-modal">
+		<div class="modal-dialog">
+		  <div class="modal-content">
+			<div class="modal-header">
+			  <h5 class="modal-title">Fai rifornimento all'aereo</h5>
+			  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div class="container-fluid">
+					<form class="form" action="#">
+						<div class="row">
+							<div class="col">
+								<label class="form-label">Quanti litri vuoi aggiungere?</label>
+								<input type="number" name="volume" value="" min="0.01"/>
+								<div class="form-text">Prezzo carburante: <span class="prezzo-carburante-replace"></span>, costo dell'operazione: <span class="prezzo-totale-replace">NC €</span></div>
+								<p class="bg-danger rounded text-white p-2 errore-replace" style="display:none;"></p>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+			<div class="modal-footer">
+			  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+			  <button type="button" class="btn btn-primary submit-form-rifornimento">Rifornisci</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+</template>
+<script type="text/javascript" defer>
+	window.addEventListener('load', function(e) {
+		if(document.getElementById('rifornimento-modal'))
+			return;
+		document.body.appendChild(document.getElementById('template-rifornimento-modal').content.cloneNode(true));
+		let modale = document.getElementById('rifornimento-modal');
+		let visualizza = false;
+		modale.addEventListener('show.bs.modal', function(e) {
+			if(visualizza)
+				return;
+			e.preventDefault();
+			let modaleInstance = bootstrap.Modal.getInstance(modale);
+			let bottone = e.relatedTarget;
+			let idAeroporto = bottone.dataset.idAeroporto;
+			let idCarburante = bottone.dataset.idCarburante;
+			idAeromobilePosseduto = bottone.dataset.idAeromobilePosseduto;
+			let xhr = new XMLHttpRequest();
+			xhr.open('GET', "{{ url_for('homepage') }}ajax/getPrezzoCarburante/"+idAeroporto+'/'+idCarburante);
+			xhr.addEventListener('load', function(e) {
+				prezzoCarburante = parseFloat(xhr.responseText);
+				modale.querySelector('span.prezzo-carburante-replace').innerHTML = prezzoCarburante;
+				visualizza = true;
+				modaleInstance.show();
+			});
+			xhr.addEventListener('loadend', function(e) {
+				bottone.innerHTML = 'Fai rifornimento';
+				bottone.disabled = '';
+			});
+			bottone.innerHTML = '<i class="fa-solid fa-spinner fa-spin-pulse"></i>';
+			bottone.disabled = 'disabled';
+			xhr.send();
+		});
+		modale.addEventListener('shown.bs.modal', function(e) {
+			visualizza = false;
+		});
+		modale.querySelector('input[name=volume]').addEventListener('keyup', function(e) {
+			let valore = parseFloat(this.value);
+			if(valore == NaN) {
+				modale.querySelector('span.prezzo-totale-replace').innerHTML = 'NC €';
+				return;
+			}
+			let prezzoTotale = valore * prezzoCarburante;
+			prezzoTotale = Math.round((prezzoTotale + Number.EPSILON) * 100) / 100;
+			modale.querySelector('span.prezzo-totale-replace').innerHTML = prezzoTotale + ' €';
+		});
+		modale.querySelector('button.submit-form-rifornimento').addEventListener('click', function(e) {
+			let volume = parseFloat(modale.querySelector('input[name=volume]').value);
+			if(volume == NaN || volume <= 0)
+				return;
+			let messaggioErrore = modale.querySelector('p.errore-replace');
+			messaggioErrore.style.display = 'none';
+			let bottone = this;
+			let xhr = new XMLHttpRequest();
+			xhr.open('POST', "{{ url_for('rifornisciAereo') }}");
+			xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+			xhr.addEventListener('load', function(e) {
+				let risposta = JSON.parse(xhr.responseText);
+				if(risposta.stato === true)
+					location.reload();
+				else {
+					messaggioErrore.innerHTML = risposta.errore;
+					messaggioErrore.style.display = 'block';
+				}
+			});
+			xhr.addEventListener('error', function(e) {
+				messaggioErrore.innerHTML = 'Si è verificato un errore di rete, riprova';
+				messaggioErrore.style.display = 'block';
+			});
+			xhr.addEventListener('loadend', function(e) {
+				bottone.innerHTML = 'Rifornisci';
+				bottone.disabled = '';
+			});
+			bottone.innerHTML = '<i class="fa-solid fa-spinner fa-spin-pulse"></i>';
+			bottone.disabled = 'disabled';
+			xhr.send('idAeromobilePosseduto='+encodeURIComponent(idAeromobilePosseduto)+'&volume='+encodeURIComponent(volume));
+		});
+		let prezzoCarburante = 0;
+		let idAeromobilePosseduto = 0;
+	});
+</script>

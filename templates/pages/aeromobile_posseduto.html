@@ -7,6 +7,20 @@
 
 {% block content %}
 <h1>Dettagli dell'aeromobile {{ aeromobilePosseduto.callsign }}</h1>
+<div class="row mb-3">
+	<div class="col">
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown">Azioni</button>
+			<ul class="dropdown-menu">
+				<li>
+					{% with aeromobilePosseduto = aeromobilePosseduto, classiBottone = 'dropdown-item' %}
+					{% include 'widgets/rifornimento.html' %}
+					{% endwith %}
+				</li>
+			</ul>
+		</div>
+	</div>
+</div>
 <div class="row">
 	<div class="col">
 		<div class="card">

@@ -22,7 +22,7 @@ CREATE TABLE `aeromobili` (
 --
 
 INSERT INTO `aeromobili` (`id`, `id_carburante`, `nome`, `capacita_serbatoio_l`, `consumo_l_h`, `numero_posti`, `velocita_massima_kn`, `velocita_crocera_kn`, `grandezza_stiva_kg`, `foto`) VALUES
-(1, 1, 'Cessna C172', 212, '35.961395', 2, 145, 100, '54.43', 'cessna-c172.webp');
+(1, 1, 'Cessna C172', 201, 35.961395, 2, 163, 124, 54.43, 'cessna-c172.webp');
 
 -- --------------------------------------------------------
 
@@ -33,16 +33,17 @@ INSERT INTO `aeromobili` (`id`, `id_carburante`, `nome`, `capacita_serbatoio_l`,
 CREATE TABLE `carburanti` (
   `id` INTEGER NOT NULL PRIMARY KEY,
   `nome` TEXT NOT NULL,
-  `prezzo_base` REAL NOT NULL
+  `prezzo_base` REAL NOT NULL,
+  `ultimo_aggiornamento` TEXT NOT NULL
 );
 
 --
 -- Dump dei dati per la tabella `carburanti`
 --
 
-INSERT INTO `carburanti` (`id`, `nome`, `prezzo_base`) VALUES
-(1, 'AVGAS 100LL', 2.43),
-(2, 'JET A-1', 1.52);
+INSERT INTO `carburanti` (`id`, `nome`, `prezzo_base`, `ultimo_aggiornamento`) VALUES
+(1, 'AVGAS 100LL', 2.43, DATETIME()),
+(2, 'JET A-1', 1.52, DATETIME());
 
 -- --------------------------------------------------------
 
