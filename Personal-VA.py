@@ -35,11 +35,16 @@ threadManager.startThreads()
 
 # Definizione funzioni web
 
-@app.route('/')
-def homepage():
+@app.before_request
+def controlloInizializzazione():
+	if request.endpoint == 'inizia' or request.endpoint == 'static':
+		return
 	inizializzato: bool = Configurazione.getConfigurazione('inizializzato', 'INTEGER') == 1
 	if not inizializzato:
 		return redirect(url_for('inizia'))
+
+@app.route('/')
+def homepage():
 	return render_template('pages/homepage.html', utente=Utente(), aerei=AeromobilePosseduto.getAeromobiliPosseduti(), ultimeTransazioni=Transazione.getTransazioni()[:10])
 
 @app.route('/inizia', methods=['GET','POST'])
