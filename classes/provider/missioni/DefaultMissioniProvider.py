@@ -35,4 +35,8 @@ class DefaultMissioniProvider(AbstractMissioniProvider):
 		missione.caricoBagagli = 0
 		if bagagli:
 			missione.caricoBagagli = round(uniform(0, bagagliMassimi), 2)
+		if passeggeri:
+			missione.descrizione = f'Trasporto di {len(missione.passeggeri)} passeggeri'
+		else:
+			missione.descrizione = f'Trasporto di merci'
 		return missione
