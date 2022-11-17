@@ -308,6 +308,7 @@ CREATE TABLE `cache` (
 
 CREATE TABLE `missioni` (
   `id` INTEGER NOT NULL PRIMARY KEY,
+  `descrizione` TEXT NOT NULL,
   `aeroporto_partenza` INTEGER NOT NULL,
   `aeroporto_arrivo` INTEGER NOT NULL,
   `data_completamento` TEXT,

@@ -3,15 +3,14 @@ from datetime import datetime
 from classes.database.Database import Database
 
 class Transazione:
-	id: int | None = None
-	causale: str = ''
-	valore: float | None = None
-	data: datetime | None = None
-
 	def __init__(self, id: int = None):
-		db: sqlite3.Connection = Database()
+		self.id: int | None = None
+		self.causale: str = ''
+		self.valore: float | None = None
+		self.data: datetime | None = None
 		if id is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM transazioni WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return

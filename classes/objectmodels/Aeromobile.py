@@ -1,21 +1,20 @@
 import sqlite3
 from classes.database.Database import Database
 class Aeromobile:
-	id: int | None = None
-	idCarburante: int | None = None
-	nome: str = ''
-	capacitaSerbatoioL: int | None = None
-	consumoLH: float | None = None
-	numeroPosti: int | None = None
-	velocitaMassimaKn: int | None = None
-	velocitaCroceraKn: int | None = None
-	grandezzaStivaKg: float | None = None
-	foto: str = ''
-
 	def __init__(self, id: int = None):
-		db: sqlite3.Connection = Database()
+		self.id: int | None = None
+		self.idCarburante: int | None = None
+		self.nome: str = ''
+		self.capacitaSerbatoioL: int | None = None
+		self.consumoLH: float | None = None
+		self.numeroPosti: int | None = None
+		self.velocitaMassimaKn: int | None = None
+		self.velocitaCroceraKn: int | None = None
+		self.grandezzaStivaKg: float | None = None
+		self.foto: str = ''
 		if id is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM aeromobili WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return

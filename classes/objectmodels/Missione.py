@@ -5,26 +5,27 @@ from classes.objectmodels.Aeroporto import Aeroporto
 from classes.objectmodels.PuntoPassaggio import PuntoPassaggio
 
 class Missione:
-	id: int | None = None
-	aeroportoPartenza: int | None = None
-	aeroportoArrivo: int | None = None
-	dataCompletamento: datetime | None = None
-	caricoBagagli: float | None = None
-	passeggeri: list[float] = []
-	puntiPassaggio: list[PuntoPassaggio] = []
-
 	def __init__(self, id: int = None):
-		db: sqlite3.Connection = Database()
+		self.id: int | None = None
+		self.descrizione: str = ''
+		self.aeroportoPartenza: Aeroporto | None = None
+		self.aeroportoArrivo: Aeroporto | None = None
+		self.dataCompletamento: datetime | None = None
+		self.caricoBagagli: float | None = None
+		self.passeggeri: list[float] = []
+		self.puntiPassaggio: list[PuntoPassaggio] = []
 		if id is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM missioni WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return
 		self.id = id
-		self.aeroportoPartenza = Aeroporto(riga[1])
-		self.aeroportoArrivo = Aeroporto(riga[2])
-		self.dataCompletamento = datetime.fromisoformat(riga[3]) if riga[3] is not None else None
-		self.caricoBagagli = riga[4]
+		self.descrizione = riga[1]
+		self.aeroportoPartenza = Aeroporto(riga[2])
+		self.aeroportoArrivo = Aeroporto(riga[3])
+		self.dataCompletamento = datetime.fromisoformat(riga[4]) if riga[4] is not None else None
+		self.caricoBagagli = riga[5]
 		for passeggero, in db.execute('SELECT peso FROM passeggeri WHERE id_missione = ?', (self.id,)).fetchall():
 			self.passeggeri.append(passeggero)
 		for puntoPassaggio, in db.execute('SELECT id FROM punti_passaggio WHERE id_missione = ?', (self.id,)).fetchall():
@@ -32,7 +33,7 @@ class Missione:
 	
 	def add(self) -> bool:
 		db: sqlite3.Connection = Database()
-		c: sqlite3.Cursor = db.execute('INSERT INTO missioni (aeroporto_partenza, aeroporto_arrivo, data_completamento, carico_bagagli) VALUES (?, ?, ?, ?)', (self.aeroportoPartenza.id, self.aeroportoArrivo.id, self.dataCompletamento.isoformat(' ', 'seconds') if self.dataCompletamento is not None else None, self.caricoBagagli))
+		c: sqlite3.Cursor = db.execute('INSERT INTO missioni (descrizione, aeroporto_partenza, aeroporto_arrivo, data_completamento, carico_bagagli) VALUES (?, ?, ?, ?, ?)', (self.descrizione, self.aeroportoPartenza.id, self.aeroportoArrivo.id, self.dataCompletamento.isoformat(' ', 'seconds') if self.dataCompletamento is not None else None, self.caricoBagagli))
 		if c.rowcount < 1:
 			return False
 		self.id = c.lastrowid
@@ -46,7 +47,7 @@ class Missione:
 	
 	def update(self) -> bool:
 		db: sqlite3.Connection = Database()
-		c: sqlite3.Cursor = db.execute('UPDATE missioni SET aeroporto_partenza = ?, aeroporto_arrivo = ?, data_completamento = ?, carico_bagagli = ? WHERE id = ?', (self.aeroportoPartenza.id, self.aeroportoArrivo.id, self.dataCompletamento.isoformat(' ', 'seconds') if self.dataCompletamento is not None else None, self.caricoBagagli, self.id))
+		c: sqlite3.Cursor = db.execute('UPDATE missioni SET descrizione = ?, aeroporto_partenza = ?, aeroporto_arrivo = ?, data_completamento = ?, carico_bagagli = ? WHERE id = ?', (self.descrizione, self.aeroportoPartenza.id, self.aeroportoArrivo.id, self.dataCompletamento.isoformat(' ', 'seconds') if self.dataCompletamento is not None else None, self.caricoBagagli, self.id))
 		if c.rowcount < 1:
 			return False
 		db.execute('DELETE FROM passeggeri WHERE id_missione = ?', (self.id,))
@@ -62,3 +63,18 @@ class Missione:
 		if self.id is None:
 			return self.add()
 		return self.update()
+	
+	@staticmethod
+	def getMissioniDisponibili():
+		db: sqlite3.Connection = Database()
+		return [Missione(id) for id, in db.execute('SELECT id FROM missioni WHERE data_completamento IS NULL')]
+	
+	@staticmethod
+	def getMissioniCompletate(dateFrom: datetime = None, dateTo: datetime = None):
+		db: sqlite3.Connection = Database()
+		query: str = 'SELECT id FROM missioni WHERE data_completamento IS NOT NULL'
+		params: tuple = ()
+		if dateFrom is not None and dateTo is not None and dateFrom < dateTo:
+			query += ' AND data_completamento > ? AND data_completamento < ?'
+			params = (dateFrom.isoformat(' ', 'seconds'), dateTo.isoformat(' ', 'seconds'))
+		return [Missione(id) for id, in db.execute(query, params)]

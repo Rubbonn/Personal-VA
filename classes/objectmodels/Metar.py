@@ -3,15 +3,14 @@ from datetime import datetime
 from classes.database.Database import Database
 
 class Metar:
-	id_aeroporto: int | None = None
-	metar: str = ''
-	ultimoAggiornamento: datetime | None = None
-	ultimoErrore: str = ''
-
 	def __init__(self, id_aeroporto: int = None):
-		db: sqlite3.Connection = Database()
+		self.id_aeroporto: int | None = None
+		self.metar: str = ''
+		self.ultimoAggiornamento: datetime | None = None
+		self.ultimoErrore: str = ''
 		if id_aeroporto is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM metar WHERE id_aeroporto = ?', (id_aeroporto,)).fetchone()
 		if riga is None:
 			return

@@ -4,19 +4,18 @@ from classes.objectmodels.Aeromobile import Aeromobile
 from classes.objectmodels.Aeroporto import Aeroporto
 from datetime import datetime
 class AeromobilePosseduto:
-	id: int | None = None
-	aeromobile: Aeromobile | None = None
-	aeroporto: Aeroporto | None = None
-	callsign: str = ''
-	carburante: float | None = None
-	migliaPercorse: float | None = None
-	dataAcquisto: datetime | None = None
-	dataUltimoVolo: datetime | None = None
-
 	def __init__(self, id: int = None):
-		db: sqlite3.Connection = Database()
+		self.id: int | None = None
+		self.aeromobile: Aeromobile | None = None
+		self.aeroporto: Aeroporto | None = None
+		self.callsign: str = ''
+		self.carburante: float | None = None
+		self.migliaPercorse: float | None = None
+		self.dataAcquisto: datetime | None = None
+		self.dataUltimoVolo: datetime | None = None
 		if id is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM aeromobili_posseduti WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return

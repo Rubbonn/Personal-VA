@@ -3,18 +3,17 @@ from classes.database.Database import Database
 from classes.objectmodels.Metar import Metar
 
 class Aeroporto:
-	id: int | None = None
-	codiceIcao: str = ''
-	nome: str = ''
-	citta: str = ''
-	nazione: str = ''
-	latitudine: float | None = None
-	longitudine: float | None = None
-
 	def __init__(self, id: int = None):
-		db: sqlite3.Connection = Database()
+		self.id: int | None = None
+		self.codiceIcao: str = ''
+		self.nome: str = ''
+		self.citta: str = ''
+		self.nazione: str = ''
+		self.latitudine: float | None = None
+		self.longitudine: float | None = None
 		if id is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM aeroporti WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return

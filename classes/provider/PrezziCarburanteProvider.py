@@ -1,9 +1,8 @@
 from .prezzi_carburante.AbstractPrezzoCarburanteProvider import AbstractPrezzoCarburanteProvider
 from .prezzi_carburante.DefaultPrezzoCarburanteProvider import DefaultPrezzoCarburanteProvider
 class PrezziCarburanteProvider:
-	__providerList: list[AbstractPrezzoCarburanteProvider] = []
-
 	def __init__(self):
+		self.__providerList: list[AbstractPrezzoCarburanteProvider] = []
 		self.__providerList.append(DefaultPrezzoCarburanteProvider())
 	
 	def getPrezzoCarburante(self, idAeroporto: int, idCarburante: int) -> float:

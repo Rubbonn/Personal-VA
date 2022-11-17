@@ -3,16 +3,15 @@ from classes.database.Database import Database
 from json import dumps, loads
 
 class PuntoPassaggio:
-	id: int | None = None
-	idMissione: int | None = None
-	latitudineCentro: float | None = None
-	longitudineCentro: float | None = None
-	perimetro: list[tuple[float,float]] = []
-
 	def __init__(self, id: int = None):
-		db: sqlite3.Connection = Database()
+		self.id: int | None = None
+		self.idMissione: int | None = None
+		self.latitudineCentro: float | None = None
+		self.longitudineCentro: float | None = None
+		self.perimetro: list[tuple[float,float]] = []
 		if id is None:
 			return
+		db: sqlite3.Connection = Database()
 		riga: tuple = db.execute('SELECT * FROM punti_passaggio WHERE id = ?', (id,)).fetchone()
 		if riga is None:
 			return
