@@ -36,6 +36,4 @@ class Transazione:
 			sql += f' WHERE data >= {dateFrom.isoformat(" ", "seconds")} AND data <= {dateTo.isoformat(" ", "seconds")}'
 		sql += ' ORDER BY data DESC'
 		risultato: list[tuple] | None = db.execute(sql).fetchall()
-		if risultato is None:
-			return []
-		return [Transazione(id[0]) for id in risultato]
+		return [Transazione(id) for id, in risultato]

@@ -29,6 +29,6 @@ class Metar:
 	def getMetars():
 		db: sqlite3.Connection = Database()
 		metar: list[Metar] = []
-		for id_aeroporto in db.execute('SELECT id_aeroporto FROM metar').fetchall():
-			metar.append(Metar(id_aeroporto[0]))
+		for id_aeroporto, in db.execute('SELECT id_aeroporto FROM metar').fetchall():
+			metar.append(Metar(id_aeroporto))
 		return metar

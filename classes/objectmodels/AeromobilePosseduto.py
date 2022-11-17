@@ -59,6 +59,4 @@ class AeromobilePosseduto:
 	def getAeromobiliPosseduti() -> list['AeromobilePosseduto']:
 		db: sqlite3.Connection = Database()
 		risultato: list[tuple] = db.execute('SELECT id FROM aeromobili_posseduti').fetchall()
-		if risultato is None:
-			return []
-		return [AeromobilePosseduto(riga[0]) for riga in risultato]
+		return [AeromobilePosseduto(riga) for riga, in risultato]

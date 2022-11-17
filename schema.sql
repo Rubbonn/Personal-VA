@@ -22,7 +22,7 @@ CREATE TABLE `aeromobili` (
 --
 
 INSERT INTO `aeromobili` (`id`, `id_carburante`, `nome`, `capacita_serbatoio_l`, `consumo_l_h`, `numero_posti`, `velocita_massima_kn`, `velocita_crocera_kn`, `grandezza_stiva_kg`, `foto`) VALUES
-(1, 1, 'Cessna C172', 201, 35.961395, 2, 163, 124, 54.43, 'cessna-c172.webp');
+(1, 1, 'Cessna C172', 201, 35.961395, 4, 163, 124, 54.43, 'cessna-c172.webp');
 
 -- --------------------------------------------------------
 
@@ -298,4 +298,44 @@ CREATE TABLE `cache` (
   `chiave` TEXT NOT NULL PRIMARY KEY,
   `valore` BLOB NOT NULL,
   `scadenza` TEXT NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `missioni`
+--
+
+CREATE TABLE `missioni` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `aeroporto_partenza` INTEGER NOT NULL,
+  `aeroporto_arrivo` INTEGER NOT NULL,
+  `data_completamento` TEXT,
+  `carico_bagagli` REAL NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `passeggeri`
+--
+
+CREATE TABLE `passeggeri` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `id_missione` INTEGER NOT NULL,
+  `peso` REAL NOT NULL
+);
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `punti_passaggio`
+--
+
+CREATE TABLE `punti_passaggio` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `id_missione` INTEGER NOT NULL,
+  `latitudine_centro` REAL NOT NULL,
+  `longitudine_centro` REAL NOT NULL,
+  `perimetro` TEXT NOT NULL
 );

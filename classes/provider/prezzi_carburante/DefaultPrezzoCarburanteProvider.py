@@ -1,5 +1,5 @@
-from .AbstractProvider import AbstractProvider
-class DefaultProvider(AbstractProvider):
+from .AbstractPrezzoCarburanteProvider import AbstractPrezzoCarburanteProvider
+class DefaultPrezzoCarburanteProvider(AbstractPrezzoCarburanteProvider):
 	def getPrezzoCarburante(self, idAeroporto: int = None, idCarburante: int = None) -> float | None:
 		import sqlite3
 		from classes.database.Database import Database

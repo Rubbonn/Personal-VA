@@ -30,9 +30,7 @@ class Aeroporto:
 	def getAeroporti() -> list['Aeroporto']:
 		db: sqlite3.Connection = Database()
 		risultati: list[tuple] = db.execute('SELECT id FROM aeroporti ORDER BY nome ASC').fetchall()
-		if risultati is None:
-			return []
-		return [Aeroporto(id[0]) for id in risultati]
+		return [Aeroporto(id) for id, in risultati]
 	
 	@staticmethod
 	def getAeroportoByIcao(icao: str) -> 'Aeroporto | None':
@@ -60,7 +58,5 @@ class Aeroporto:
 	def getAeromobiliPosseduti(self) -> list['AeromobilePosseduto']:
 		db: sqlite3.Connection = Database()
 		risultato: tuple = db.execute('SELECT id FROM aeromobili_posseduti WHERE aeroporto = ?', (self.id,)).fetchall()
-		if risultato is None:
-			return []
 		from classes.objectmodels.AeromobilePosseduto import AeromobilePosseduto
-		return [AeromobilePosseduto(riga[0]) for riga in risultato]
+		return [AeromobilePosseduto(riga) for riga, in risultato]
