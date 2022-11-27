@@ -27,6 +27,7 @@ if not exists(database):
 		with app.open_resource('schema.sql', mode='r') as f:
 			db.executescript(f.read())
 		db.commit()
+		db.close()
 
 threadManager: ThreadManager = ThreadManager()
 atexit.register(threadManager.stopThreads)

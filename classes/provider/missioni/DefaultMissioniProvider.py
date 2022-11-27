@@ -12,8 +12,7 @@ class DefaultMissioniProvider(AbstractMissioniProvider):
 		passeggeriMassimi: int = 0
 		bagagliMassimi: float = 0
 		for aeromobile in aeromobili:
-			distanza: float = (aeromobile.aeromobile.capacitaSerbatoioL / aeromobile.aeromobile.consumoLH) * aeromobile.aeromobile.velocitaCroceraKn
-			distanzaMassima = max(distanzaMassima, distanza)
+			distanzaMassima = max(distanzaMassima, (aeromobile.aeromobile.capacitaSerbatoioL / aeromobile.aeromobile.consumoLH) * aeromobile.aeromobile.velocitaCroceraKn)
 			passeggeriMassimi = max(passeggeriMassimi, aeromobile.aeromobile.numeroPosti - 2)
 			bagagliMassimi = max(bagagliMassimi, aeromobile.aeromobile.grandezzaStivaKg)
 		while True:

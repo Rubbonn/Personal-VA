@@ -336,6 +336,7 @@ CREATE TABLE `passeggeri` (
 CREATE TABLE `punti_passaggio` (
   `id` INTEGER NOT NULL PRIMARY KEY,
   `id_missione` INTEGER NOT NULL,
+  `nome` TEXT NOT NULL,
   `latitudine_centro` REAL NOT NULL,
   `longitudine_centro` REAL NOT NULL,
   `perimetro` TEXT NOT NULL

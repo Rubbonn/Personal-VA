@@ -6,6 +6,7 @@ class PuntoPassaggio:
 	def __init__(self, id: int = None):
 		self.id: int | None = None
 		self.idMissione: int | None = None
+		self.nome: str | None = None
 		self.latitudineCentro: float | None = None
 		self.longitudineCentro: float | None = None
 		self.perimetro: list[tuple[float,float]] = []
@@ -17,13 +18,14 @@ class PuntoPassaggio:
 			return
 		self.id = id
 		self.idMissione = riga[1]
-		self.latitudineCentro = riga[2]
-		self.longitudineCentro = riga[3]
-		self.perimetro = loads(riga[4])
+		self.nome = riga[2]
+		self.latitudineCentro = riga[3]
+		self.longitudineCentro = riga[4]
+		self.perimetro = loads(riga[5])
 	
 	def add(self) -> bool:
 		db: sqlite3.Connection = Database()
-		c: sqlite3.Cursor = db.execute('INSERT INTO punti_passaggio (id_missione, latitudine_centro, longitudine_centro, perimetro) VALUES (?, ?, ?, ?)', (self.idMissione, self.latitudineCentro, self.longitudineCentro, dumps(self.perimetro)))
+		c: sqlite3.Cursor = db.execute('INSERT INTO punti_passaggio (id_missione, nome, latitudine_centro, longitudine_centro, perimetro) VALUES (?, ?, ?, ?)', (self.idMissione, self.nome, self.latitudineCentro, self.longitudineCentro, dumps(self.perimetro)))
 		db.commit()
 		if c.rowcount >= 1:
 			self.id = c.lastrowid
@@ -32,7 +34,7 @@ class PuntoPassaggio:
 	
 	def update(self) -> bool:
 		db: sqlite3.Connection = Database()
-		c: sqlite3.Cursor = db.execute('UPDATE punti_passaggio SET id_missione = ?, latitudine_centro = ?, longitudine_centro = ?, perimetro = ? WHERE id = ?', (self.idMissione, self.latitudineCentro, self.longitudineCentro, dumps(self.perimetro), self.id))
+		c: sqlite3.Cursor = db.execute('UPDATE punti_passaggio SET id_missione = ?, nome = ?, latitudine_centro = ?, longitudine_centro = ?, perimetro = ? WHERE id = ?', (self.idMissione, self.nome, self.latitudineCentro, self.longitudineCentro, dumps(self.perimetro), self.id))
 		db.commit()
 		return c.rowcount >= 1
 	
