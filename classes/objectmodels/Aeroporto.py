@@ -11,6 +11,7 @@ class Aeroporto:
 		self.nazione: str = ''
 		self.latitudine: float | None = None
 		self.longitudine: float | None = None
+		self.metar: str | None = None
 		if id is None:
 			return
 		db: sqlite3.Connection = Database()
@@ -24,6 +25,7 @@ class Aeroporto:
 		self.nazione = riga[4]
 		self.latitudine = riga[5]
 		self.longitudine = riga[6]
+		self.metar = self.getMetar()
 	
 	@staticmethod
 	def getAeroporti() -> list['Aeroporto']:
@@ -52,7 +54,8 @@ class Aeroporto:
 		return d
 	
 	def getMetar(self) -> Metar:
-		return Metar(self.id)
+		self.metar = Metar(self.id)
+		return self.metar
 	
 	def getAeromobiliPosseduti(self) -> list['AeromobilePosseduto']:
 		db: sqlite3.Connection = Database()

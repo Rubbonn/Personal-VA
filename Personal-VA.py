@@ -1,7 +1,7 @@
 import sqlite3
 import atexit
 from secrets import token_hex
-from flask import Flask, redirect, render_template, request, flash, url_for, jsonify
+from flask import Flask, redirect, render_template, request, Response, flash, url_for, jsonify
 from os.path import exists
 from datetime import datetime
 from classes.objectmodels.Configurazione import Configurazione
@@ -106,6 +106,14 @@ def impostazioni():
 		threadManager.restartThread(aggiornaMetarThreadIndice)
 	return render_template('pages/impostazioni.html', form=form, configurazioni=Configurazione.getAllConfigurazioni())
 
+@app.route('/nuovo-volo')
+def nuovoVolo():
+	from classes.forms.NuovoVolo import NuovoVolo
+	nuovoVoloForm: NuovoVolo = NuovoVolo(request.form)
+	if request.method == 'POST' and nuovoVoloForm.validate():
+		pass
+	return render_template('pages/nuovo_volo.html', nuovoVoloForm=nuovoVoloForm)
+
 @app.route('/ajax/getPrezzoCarburante/<int:idAeroporto>/<int:idCarburante>')
 def getPrezzoCarburante(idAeroporto:int, idCarburante:int):
 	return jsonify(PrezziCarburanteProvider().getPrezzoCarburante(idAeroporto, idCarburante))
@@ -139,5 +147,21 @@ def rifornisciAereo():
 	transazione.save()
 	Utente.aggiornaSaldo(-transazione.valore)
 	return jsonify({'stato': True})
+
+@app.route('/ajax/getInfoAeromobilePosseduto/<int:idAeromobilePosseduto>')
+def getInfoAeromobilePosseduto(idAeromobilePosseduto:int):
+	aeromobile: AeromobilePosseduto = AeromobilePosseduto(idAeromobilePosseduto)
+	if aeromobile.id is None:
+		return jsonify(False)
+	from jsonpickle import encode
+	return Response(encode(aeromobile, False), mimetype='application/json')
+
+@app.route('/ajax/getInfoAeroporto/<int:idAeroporto>')
+def getInfoAeroporto(idAeroporto:int):
+	aeroporto: Aeroporto = Aeroporto(idAeroporto)
+	if aeroporto.id is None:
+		return jsonify(False)
+	from jsonpickle import encode
+	return Response(encode(aeroporto, False), mimetype='application/json')
 
 app.run('0.0.0.0', 80, debug=True, use_reloader=False)

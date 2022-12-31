@@ -15,12 +15,6 @@ def aggiornaMetar(shutdownEvent: Event) -> None:
 	elencoAeroporti: list[str] = [aeroporto.codiceIcao for aeroporto in elencoAeroporti if len(aeroporto.codiceIcao) > 0]
 	url: str = 'https://metar.vatsim.net/' + ','.join(elencoAeroporti)
 	while True:
-		for i in range(intervallo):
-			if shutdownEvent.is_set():
-				break
-			sleep(1)
-		if shutdownEvent.is_set():
-			break
 		try:
 			with urlopen(url) as risposta:
 				metars: list[str] = risposta.read().decode().split('\n')
@@ -38,4 +32,10 @@ def aggiornaMetar(shutdownEvent: Event) -> None:
 			for metar in Metar.getMetars():
 				metar.ultimoErrore = str(e)
 				metar.save()
+		for i in range(intervallo):
+			if shutdownEvent.is_set():
+				break
+			sleep(1)
+		if shutdownEvent.is_set():
+			break
 	db.close()

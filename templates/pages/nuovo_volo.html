@@ -1,0 +1,184 @@
+{% extends 'partials/layout.html' %}
+{% block title %}Nuovo Volo - Personal Virtual Airline{% endblock %}
+{% block before_head_closing_tag %}
+{{ super() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+{% endblock %}
+
+{% block content %}
+<h1>Effettua un nuovo volo sul simulatore</h1>
+<div class="row">
+	<div class="col">
+		<form method="post" action="{{ url_for('nuovoVolo') }}">
+			<div class="mb-3">
+				<label class="form-label">Aeromobile da utilizzare</label>
+				<select class="form-select {% if nuovoVoloForm.aeromobile.errors %}is-invalid{% endif %}" name="aeromobile">
+					<option value=""> - </option>
+					{% for option in nuovoVoloForm.aeromobile.choices %}
+					<option value="{{ option[0] }}" {% if nuovoVoloForm.aeromobile.data is not none and option[0] == nuovoVoloForm.aeromobile.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="mb-3">
+				<label class="form-label">Aeroporto di partenza</label>
+				<select class="form-select {% if nuovoVoloForm.aeroportoPartenza.errors %}is-invalid{% endif %}" name="aeroportoPartenza">
+					<option value=""> - </option>
+					{% for option in nuovoVoloForm.aeroportoPartenza.choices %}
+					<option value="{{ option[0] }}" {% if nuovoVoloForm.aeroportoPartenza.data is not none and option[0] == nuovoVoloForm.aeroportoPartenza.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div class="mb-3">
+				<label class="form-label">Aeroporto di arrivo</label>
+				<select class="form-select {% if nuovoVoloForm.aeroportoArrivo.errors %}is-invalid{% endif %}" name="aeroportoArrivo">
+					<option value=""> - </option>
+					{% for option in nuovoVoloForm.aeroportoArrivo.choices %}
+					<option value="{{ option[0] }}" {% if nuovoVoloForm.aeroportoArrivo.data is not none and option[0] == nuovoVoloForm.aeroportoArrivo.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
+					{% endfor %}
+				</select>
+			</div>
+			<div>
+				<button type="submit" class="btn btn-primary float-end">Salva e inizia volo <i class="fas fa-arrow-right"></i></button>
+			</div>
+		</form>
+	</div>
+	<div class="col">
+		<div class="position-relative mb-2">
+			<div id="mappa" style="height:500px"></div>
+			<div class="caricamento position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 text-white" style="z-index:1000;display:none;"><span class="position-absolute top-50 start-50 translate-middle"><i class="fas fa-spinner fa-2xl fa-spin-pulse"></i></span></div>
+		</div>
+		<div class="position-relative">
+			<div id="info-volo" style="min-height:50px;"></div>
+			<div class="caricamento position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 text-white" style="z-index:1000;display:none;"><span class="position-absolute top-50 start-50 translate-middle"><i class="fas fa-spinner fa-2xl fa-spin-pulse"></i></span></div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block before_body_closing_tag %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin="" defer></script>
+<script type="text/javascript">
+	window.addEventListener('DOMContentLoaded', function() {
+		let aeroportoPartenza = document.getElementsByName('aeroportoPartenza')[0];
+		let aeroportoArrivo = document.getElementsByName('aeroportoArrivo')[0];
+		let aeromobile = document.getElementsByName('aeromobile')[0];
+		
+		let mappa = document.getElementById('mappa');
+		let markerLayerGroup;
+		if(typeof L !== 'undefined') {
+			mappa = L.map(mappa, {
+				center: [41.9102415, 12.3959153],
+				zoom: 6,
+				layers: [
+					L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.jpg?path=latest/base/latest', {
+						attribution: ["(c) open flightmaps association", "(c) openstreetmap contributors", "NASA elevation data"].join(', '),
+						crossOrigin: '.jpg',
+						minNativeZoom: 7,
+						maxNativeZoom: 12
+					}),
+					L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.png?path=latest/aero/latest', {
+						attribution: ["(c) open flightmaps association", "(c) openstreetmap contributors", "NASA elevation data"].join(', '),
+						crossOrigin: '.png',
+						minNativeZoom: 7,
+						maxNativeZoom: 12,
+					})
+				]
+			});
+			markerLayerGroup = L.layerGroup().addTo(mappa);
+		} else
+			mappa.innerHTML = '<p>Oops, sembra che tu non sia connesso ad internet. Impossibile visualizzare la mappa.</p>';
+
+		function aggiornaMappa(idAeroportoPartenza, idAeroportoArrivo) {
+			if(typeof L === 'undefined')
+				return;
+			let caricamento = mappa.getContainer().nextElementSibling;
+			caricamento.style.display = 'block';
+			markerLayerGroup.clearLayers();
+			if(idAeroportoPartenza && idAeroportoArrivo)
+				Promise.all([fetch("{{ url_for('homepage') }}ajax/getInfoAeroporto/"+idAeroportoPartenza), fetch("{{ url_for('homepage') }}ajax/getInfoAeroporto/"+idAeroportoArrivo)]).then(response => Promise.all(response.map(response => response.json()))).then(function(response) {
+					if(!response[0] || !response[1]) {
+						caricamento.style.display = 'none';
+						return;
+					}
+					L.marker([response[0].latitudine, response[0].longitudine]).addTo(markerLayerGroup);
+					L.marker([response[1].latitudine, response[1].longitudine]).addTo(markerLayerGroup);
+					mappa.fitBounds(L.polyline([[response[0].latitudine, response[0].longitudine], [response[1].latitudine, response[1].longitudine]]).addTo(markerLayerGroup).getBounds());
+					caricamento.style.display = 'none';
+				});
+			else if(idAeroportoPartenza) {
+				fetch("{{ url_for('homepage') }}ajax/getInfoAeroporto/"+idAeroportoPartenza).then(response => response.json()).then(function(aeroporto) {
+					if(!aeroporto) {
+						caricamento.style.display = 'none';
+						return;
+					}
+					L.marker([aeroporto.latitudine, aeroporto.longitudine]).addTo(markerLayerGroup);
+					caricamento.style.display = 'none';
+				});
+			} else if(idAeroportoArrivo) {
+				fetch("{{ url_for('homepage') }}ajax/getInfoAeroporto/"+idAeroportoArrivo).then(response => response.json()).then(function(aeroporto) {
+					if(!aeroporto) {
+						caricamento.style.display = 'none';
+						return;
+					}
+					L.marker([aeroporto.latitudine, aeroporto.longitudine]).addTo(markerLayerGroup);
+					caricamento.style.display = 'none';
+				});
+			}
+		}
+
+		function aggiornaInfo(idAeromobilePosseduto, idAeroportoPartenza, idAeroportoArrivo) {
+			let infoContainer = document.getElementById('info-volo');
+			if(!idAeromobilePosseduto) {
+				infoContainer.innerHTML = 'Seleziona un aeromobile per avere le stime';
+				return;
+			}
+			if(!idAeroportoPartenza || !idAeroportoArrivo) {
+				infoContainer.innerHTML = 'Seleziona entrambi gli aeroporti per avere le stime';
+				return;
+			}
+			infoContainer.innerHTML = '';
+			let caricamento = infoContainer.nextElementSibling;
+			caricamento.style.display = 'block';
+			Promise.all([fetch("{{ url_for('homepage') }}ajax/getInfoAeromobilePosseduto/"+idAeromobilePosseduto), fetch("{{ url_for('homepage') }}ajax/getInfoAeroporto/"+idAeroportoPartenza), fetch("{{ url_for('homepage') }}ajax/getInfoAeroporto/"+idAeroportoArrivo)])
+				.then(response => Promise.all(response.map(response => response.json())))
+				.then(function([aeromobilePosseduto, aeroportoPartenza, aeroportoArrivo]) {
+					// Calcolo distanza
+					let R = 3440.0647948; // Radius of earth in NM
+					let dLat = aeroportoArrivo.latitudine * Math.PI / 180 - aeroportoPartenza.latitudine * Math.PI / 180;
+					let dLon = aeroportoArrivo.longitudine * Math.PI / 180 - aeroportoPartenza.longitudine * Math.PI / 180;
+					let a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(aeroportoPartenza.latitudine * Math.PI / 180) * Math.cos(aeroportoArrivo.latitudine * Math.PI / 180) * Math.sin(dLon/2) * Math.sin(dLon/2);
+					let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+					let distanza = R * c;
+					// Calcolo tempo di volo
+					let tempoVolo = distanza / aeromobilePosseduto.aeromobile.velocitaCroceraKn;
+					// Calcolo carburante
+					let carburanteVolo = aeromobilePosseduto.aeromobile.consumoLH * tempoVolo;
+					tempoVolo = new Date(tempoVolo * 3600 * 1000);
+					infoContainer.innerHTML = `<h6>Stime del volo</h6><ul><li>Meteo alla partenza: ${aeroportoPartenza.metar.metar}</li><li>Meteo all'arrivo: ${aeroportoArrivo.metar.metar}</li><li>Distanza diretta: ${distanza.toFixed(0)} NM</li><li>Tempo di volo: ${tempoVolo.getUTCHours()}:${tempoVolo.getUTCMinutes()}:${tempoVolo.getUTCSeconds()} a ${aeromobilePosseduto.aeromobile.velocitaCroceraKn} Kn</li><li>Carburante necessario: ${carburanteVolo.toFixed(2)} L</li></ul>`;
+					caricamento.style.display = 'none';
+				});
+		}
+
+		aeromobile.addEventListener('change', function(e) {
+			if(!this.value) {
+				aeroportoPartenza.removeAttribute('disabled');
+				aggiornaInfo(this.value, aeroportoPartenza.value, aeroportoArrivo.value);
+				return;
+			}
+			fetch("{{ url_for('homepage') }}ajax/getInfoAeromobilePosseduto/"+this.value).then(response => response.json()).then(function(aeromobilePosseduto) {
+				if(!aeromobilePosseduto)
+					return;
+				aeroportoPartenza.value = aeromobilePosseduto.aeroporto.id;
+				aeroportoPartenza.setAttribute('disabled', 'disabled');
+				aggiornaMappa(aeroportoPartenza.value, aeroportoArrivo.value);
+				aggiornaInfo(aeromobilePosseduto.id, aeroportoPartenza.value, aeroportoArrivo.value);
+			});
+		});
+		[aeroportoPartenza, aeroportoArrivo].forEach(e => e.addEventListener('change', function(e) {
+			aggiornaMappa(aeroportoPartenza.value, aeroportoArrivo.value);
+			aggiornaInfo(aeromobile.value, aeroportoPartenza.value, aeroportoArrivo.value);
+		}));
+	});
+</script>
+{% endblock %}
