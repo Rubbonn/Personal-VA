@@ -341,3 +341,20 @@ CREATE TABLE `punti_passaggio` (
   `longitudine_centro` REAL NOT NULL,
   `perimetro` TEXT NOT NULL
 );
+
+-- --------------------------------------------------------
+
+--
+-- Struttura della tabella `voli`
+--
+
+CREATE TABLE `voli` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `aeromobile_posseduto` INTEGER NOT NULL,
+  `aeroporto_partenza` INTEGER NOT NULL,
+  `aeroporto_arrivo` INTEGER NOT NULL,
+  `data_creazione` TEXT NOT NULL,
+  `data_fine` TEXT,
+  `tempo_impiegato` TEXT,
+  `distanza_percorsa` REAL
+);

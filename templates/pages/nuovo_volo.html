@@ -18,6 +18,9 @@
 					<option value="{{ option[0] }}" {% if nuovoVoloForm.aeromobile.data is not none and option[0] == nuovoVoloForm.aeromobile.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
 					{% endfor %}
 				</select>
+				{% if nuovoVoloForm.aeromobile.errors %}
+					<ul class="invalid-feedback">{% for error in nuovoVoloForm.aeromobile.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
 			</div>
 			<div class="mb-3">
 				<label class="form-label">Aeroporto di partenza</label>
@@ -27,6 +30,9 @@
 					<option value="{{ option[0] }}" {% if nuovoVoloForm.aeroportoPartenza.data is not none and option[0] == nuovoVoloForm.aeroportoPartenza.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
 					{% endfor %}
 				</select>
+				{% if nuovoVoloForm.aeroportoPartenza.errors %}
+					<ul class="invalid-feedback">{% for error in nuovoVoloForm.aeroportoPartenza.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
 			</div>
 			<div class="mb-3">
 				<label class="form-label">Aeroporto di arrivo</label>
@@ -36,9 +42,13 @@
 					<option value="{{ option[0] }}" {% if nuovoVoloForm.aeroportoArrivo.data is not none and option[0] == nuovoVoloForm.aeroportoArrivo.data %}selected="selected"{% endif %}>{{ option[1] }}</option>
 					{% endfor %}
 				</select>
+				{% if nuovoVoloForm.aeroportoArrivo.errors %}
+					<ul class="invalid-feedback">{% for error in nuovoVoloForm.aeroportoArrivo.errors %}<li>{{ error }}</li>{% endfor %}</ul>
+				{% endif %}
 			</div>
-			<div>
-				<button type="submit" class="btn btn-primary float-end">Salva e inizia volo <i class="fas fa-arrow-right"></i></button>
+			<div class="text-end">
+				<button type="submit" class="btn btn-primary" name="save">Salva volo <i class="fas fa-save"></i></button>
+				<button type="submit" class="btn btn-primary" name="saveAndStart">Salva e inizia volo <i class="fas fa-arrow-right"></i></button>
 			</div>
 		</form>
 	</div>
@@ -124,7 +134,8 @@
 					L.marker([aeroporto.latitudine, aeroporto.longitudine]).addTo(markerLayerGroup);
 					caricamento.style.display = 'none';
 				});
-			}
+			} else
+				caricamento.style.display = 'none';
 		}
 
 		function aggiornaInfo(idAeromobilePosseduto, idAeroportoPartenza, idAeroportoArrivo) {
@@ -160,21 +171,6 @@
 				});
 		}
 
-		aeromobile.addEventListener('change', function(e) {
-			if(!this.value) {
-				aeroportoPartenza.removeAttribute('disabled');
-				aggiornaInfo(this.value, aeroportoPartenza.value, aeroportoArrivo.value);
-				return;
-			}
-			fetch("{{ url_for('homepage') }}ajax/getInfoAeromobilePosseduto/"+this.value).then(response => response.json()).then(function(aeromobilePosseduto) {
-				if(!aeromobilePosseduto)
-					return;
-				aeroportoPartenza.value = aeromobilePosseduto.aeroporto.id;
-				aeroportoPartenza.setAttribute('disabled', 'disabled');
-				aggiornaMappa(aeroportoPartenza.value, aeroportoArrivo.value);
-				aggiornaInfo(aeromobilePosseduto.id, aeroportoPartenza.value, aeroportoArrivo.value);
-			});
-		});
 		[aeroportoPartenza, aeroportoArrivo].forEach(e => e.addEventListener('change', function(e) {
 			aggiornaMappa(aeroportoPartenza.value, aeroportoArrivo.value);
 			aggiornaInfo(aeromobile.value, aeroportoPartenza.value, aeroportoArrivo.value);

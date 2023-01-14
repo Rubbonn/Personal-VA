@@ -10,6 +10,7 @@ from classes.objectmodels.Aeromobile import Aeromobile
 from classes.objectmodels.AeromobilePosseduto import AeromobilePosseduto
 from classes.objectmodels.Utente import Utente
 from classes.objectmodels.Transazione import Transazione
+from classes.objectmodels.Volo import Volo
 from classes.threads.ThreadManager import ThreadManager
 from classes.threads.aggiornaMetar import aggiornaMetar
 from classes.database.Database import Database
@@ -106,12 +107,22 @@ def impostazioni():
 		threadManager.restartThread(aggiornaMetarThreadIndice)
 	return render_template('pages/impostazioni.html', form=form, configurazioni=Configurazione.getAllConfigurazioni())
 
-@app.route('/nuovo-volo')
+@app.route('/nuovo-volo', methods=['GET', 'POST'])
 def nuovoVolo():
 	from classes.forms.NuovoVolo import NuovoVolo
 	nuovoVoloForm: NuovoVolo = NuovoVolo(request.form)
 	if request.method == 'POST' and nuovoVoloForm.validate():
-		pass
+		nuovoVolo: Volo = Volo()
+		nuovoVolo.aeromobilePosseduto = AeromobilePosseduto(nuovoVoloForm.aeromobile.data)
+		nuovoVolo.aeroportoPartenza = Aeroporto(nuovoVoloForm.aeroportoPartenza.data)
+		nuovoVolo.aeroportoArrivo = Aeroporto(nuovoVoloForm.aeroportoArrivo.data)
+		nuovoVolo.dataCreazione = datetime.now()
+		nuovoVolo.save()
+		if 'save' in request.form:
+			return redirect(url_for('homepage'))
+		elif 'saveAndStart' in request.form:
+			# TODO Cambiare il redirect con la pagina del volo quando pronta
+			return redirect(url_for('homepage'))
 	return render_template('pages/nuovo_volo.html', nuovoVoloForm=nuovoVoloForm)
 
 @app.route('/ajax/getPrezzoCarburante/<int:idAeroporto>/<int:idCarburante>')
