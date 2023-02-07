@@ -67,7 +67,8 @@
 					maxZoom: 19,
 					attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
 				})
-			);
+			)
+			.addTo(mappa);
 		let layerVfr = L.layerGroup()
 			.addLayer(
 				L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.jpg?path=latest/base/latest', {
@@ -85,7 +86,6 @@
 					maxNativeZoom: 12,
 				})
 			);
-		layerPolitico.addTo(mappa);
 		document.getElementById('mappa-politica').addEventListener('click', function() {
 			mappa.removeLayer(layerVfr).addLayer(layerPolitico);
 		});
