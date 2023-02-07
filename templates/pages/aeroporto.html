@@ -32,7 +32,7 @@
 			<div class="card-body">
 				<ul>
 					{% for aeromobile in aeroporto.getAeromobiliPosseduti() %}
-					<li>{{ aeromobile.callsign }}</li>
+					<li><a href="{{ url_for('aeromobiliPosseduti', idAeromobilePosseduto=aeromobile.id) }}">{{ aeromobile.callsign }}</a></li>
 					{% else %}
 					<li>Nessun aeromobile presente</li>
 					{% endfor %}
@@ -42,6 +42,10 @@
 	</div>
 	<div class="col">
 		<div id="mappa" style="height:500px"></div>
+		<div class="btn-group">
+			<button type="button" class="btn btn-primary" style="border-top-left-radius:0" id="mappa-politica">Politica</button>
+			<button type="button" class="btn btn-primary" style="border-top-right-radius:0" id="mappa-vfr">VFR</button>
+		</div>
 	</div>
 </div>
 {% endblock %}
@@ -57,10 +61,37 @@
 			return;
 		}
 		mappa = L.map(mappa).setView([{{ aeroporto.latitudine }}, {{ aeroporto.longitudine }}], 13);
-		L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			maxZoom: 19,
-			attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
-		}).addTo(mappa);
+		let layerPolitico = L.layerGroup()
+			.addLayer(
+				L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					maxZoom: 19,
+					attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+				})
+			);
+		let layerVfr = L.layerGroup()
+			.addLayer(
+				L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.jpg?path=latest/base/latest', {
+					attribution: ["(c) open flightmaps association", "(c) openstreetmap contributors", "NASA elevation data"].join(', '),
+					crossOrigin: '.jpg',
+					minNativeZoom: 7,
+					maxNativeZoom: 12
+				})
+			)
+			.addLayer(
+				L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.png?path=latest/aero/latest', {
+					attribution: ["(c) open flightmaps association", "(c) openstreetmap contributors", "NASA elevation data"].join(', '),
+					crossOrigin: '.png',
+					minNativeZoom: 7,
+					maxNativeZoom: 12,
+				})
+			);
+		layerPolitico.addTo(mappa);
+		document.getElementById('mappa-politica').addEventListener('click', function() {
+			mappa.removeLayer(layerVfr).addLayer(layerPolitico);
+		});
+		document.getElementById('mappa-vfr').addEventListener('click', function() {
+			mappa.removeLayer(layerPolitico).addLayer(layerVfr);
+		});
 	});
 </script>
 {% endblock %}
