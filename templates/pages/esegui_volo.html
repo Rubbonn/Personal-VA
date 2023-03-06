@@ -1,0 +1,93 @@
+{% extends 'partials/layout.html' %}
+{% block title %}Nuovo Volo - Personal Virtual Airline{% endblock %}
+{% block before_head_closing_tag %}
+{{ super() }}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.2/dist/leaflet.css" integrity="sha256-sA+zWATbFveLLNqWO2gtiw3HL/lh1giY/Inf1BJ0z14=" crossorigin="" />
+{% endblock %}
+
+{% block content %}
+<h1>Monitoraggio volo {{ volo.id }}: {{ volo.aeroportoPartenza.citta }} -> {{ volo.aeroportoArrivo.citta }}</h1>
+<div class="row">
+	<div class="col">
+		<div class="card">
+			<div class="card-header">Informazioni generali</div>
+			<div class="card-body">
+				<ul>
+					<li>Aeromobile: {{ volo.aeromobilePosseduto.callsign }} ({{ volo.aeromobilePosseduto.aeromobile.nome }})</li>
+					<li>Carburante a bordo: {{ volo.aeromobilePosseduto.getFormattedCarburante() }}</li>
+					<li>Partenza da: {{ volo.aeroportoPartenza.citta }} ({{ volo.aeroportoPartenza.codiceIcao }})</li>
+					<li>Arrivo a: {{ volo.aeroportoArrivo.citta }} ({{ volo.aeroportoArrivo.codiceIcao }})</li>
+					<li>Distanza approssimativa: {{ volo.getDistanzaFormatted() }}</li>
+					<li>Durata stimata del volo: {{ volo.getTempoFormatted() }}</li>
+					<li>Carburante necessario stimato: {{ volo.getCarburanteFormatted() }}</li>
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="col">
+		<div class="position-relative mb-2">
+			<div id="mappa" style="height:500px"></div>
+			<div class="btn-group">
+				<button type="button" class="btn btn-primary" style="border-top-left-radius:0" id="mappa-politica">Politica</button>
+				<button type="button" class="btn btn-primary" style="border-top-right-radius:0" id="mappa-vfr">VFR</button>
+			</div>
+			<div class="caricamento position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 text-white" style="z-index:1000;display:none;"><span class="position-absolute top-50 start-50 translate-middle"><i class="fas fa-spinner fa-2xl fa-spin-pulse"></i></span></div>
+		</div>
+	</div>
+</div>
+{% endblock %}
+
+{% block before_body_closing_tag %}
+{{ super() }}
+<script src="https://unpkg.com/leaflet@1.9.2/dist/leaflet.js" integrity="sha256-o9N1jGDZrf5tS+Ft4gbIK7mYMipq9lqpVJ91xHSyKhg=" crossorigin="" defer></script>
+<script type="text/javascript">
+	window.addEventListener('DOMContentLoaded', function() {
+		/* Gestione della mappa */
+		let mappa = document.getElementById('mappa');
+		if(typeof L === 'undefined') {
+			mappa.innerHTML = '<p>Oops, sembra che tu non sia connesso ad internet. Impossibile visualizzare la mappa.</p>';
+			return;
+		}
+		let markerLayerGroup;
+		mappa = L.map(mappa, {
+			center: [{{ volo.aeroportoPartenza.latitudine }}, {{ volo.aeroportoPartenza.longitudine }}],
+			zoom: 12
+		});
+		let layerPolitico = L.layerGroup()
+			.addLayer(
+				L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+					maxZoom: 19,
+					attribution: '&copy; <a href="http://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a>'
+				})
+			);
+		let layerVfr = L.layerGroup()
+			.addLayer(
+				L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.jpg?path=latest/base/latest', {
+					attribution: ["(c) open flightmaps association", "(c) openstreetmap contributors", "NASA elevation data"].join(', '),
+					crossOrigin: '.jpg',
+					minNativeZoom: 7,
+					maxNativeZoom: 12
+				})
+			)
+			.addLayer(
+				L.tileLayer('https://nwy-tiles-api.prod.newaydata.com/tiles/{z}/{x}/{y}.png?path=latest/aero/latest', {
+					attribution: ["(c) open flightmaps association", "(c) openstreetmap contributors", "NASA elevation data"].join(', '),
+					crossOrigin: '.png',
+					minNativeZoom: 7,
+					maxNativeZoom: 12,
+				})
+			)
+			.addTo(mappa);
+		markerLayerGroup = L.layerGroup().addTo(mappa);
+		L.marker([{{ volo.aeroportoPartenza.latitudine }}, {{ volo.aeroportoPartenza.longitudine }}]).addTo(markerLayerGroup);
+		L.marker([{{ volo.aeroportoArrivo.latitudine }}, {{ volo.aeroportoArrivo.longitudine }}]).addTo(markerLayerGroup);
+		L.polyline([[{{ volo.aeroportoPartenza.latitudine }}, {{ volo.aeroportoPartenza.longitudine }}], [{{ volo.aeroportoArrivo.latitudine }}, {{ volo.aeroportoArrivo.longitudine }}]]).addTo(markerLayerGroup);
+		document.getElementById('mappa-politica').addEventListener('click', function() {
+			mappa.removeLayer(layerVfr).addLayer(layerPolitico);
+		});
+		document.getElementById('mappa-vfr').addEventListener('click', function() {
+			mappa.removeLayer(layerPolitico).addLayer(layerVfr);
+		});
+	});
+</script>
+{% endblock %}

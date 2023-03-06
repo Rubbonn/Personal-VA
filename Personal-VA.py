@@ -130,7 +130,13 @@ def nuovoVolo():
 
 @app.route('/esegui-volo')
 def eseguiVolo():
-	pass
+	volo: Volo = Volo.getUltimoVoloDaFare()
+	if volo.id is None:
+		flash('Nessun volo in sospeso, procedi prima a crearne uno', 'error')
+		return redirect(url_for('homepage'))
+	print(volo.id)
+	
+	return render_template('pages/esegui_volo.html', volo=volo)
 
 @app.route('/ajax/getPrezzoCarburante/<int:idAeroporto>/<int:idCarburante>')
 def getPrezzoCarburante(idAeroporto:int, idCarburante:int):

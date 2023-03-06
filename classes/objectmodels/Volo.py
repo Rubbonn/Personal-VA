@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from classes.database.Database import Database
 from classes.objectmodels.AeromobilePosseduto import AeromobilePosseduto
 from classes.objectmodels.Aeroporto import Aeroporto
@@ -58,6 +58,35 @@ class Volo:
 		if c.rowcount > 0:
 			return True
 		return False
+	
+	def calcolaDistanza(self) -> float:
+		from math import sqrt, pi, sin, cos, atan2
+		R: float = 3440.0647948 # Radius of earth in NM
+		dLat: float = self.aeroportoArrivo.latitudine * pi / 180 - self.aeroportoPartenza.latitudine * pi / 180
+		dLon: float = self.aeroportoArrivo.longitudine * pi / 180 - self.aeroportoPartenza.longitudine * pi / 180
+		a: float = sin(dLat/2) * sin(dLat/2) + cos(self.aeroportoPartenza.latitudine * pi / 180) * cos(self.aeroportoArrivo.latitudine * pi / 180) * sin(dLon/2) * sin(dLon/2)
+		c: float = 2 * atan2(sqrt(a), sqrt(1-a))
+		d: float = R * c
+		return d
+	
+	def getDistanzaFormatted(self) -> str:
+		return f'{self.calcolaDistanza():,.2f} NM'
+
+	def calcolaTempo(self) -> timedelta:
+		distanza: float = self.calcolaDistanza()
+		oreStimate: float = distanza / self.aeromobilePosseduto.aeromobile.velocitaCroceraKn
+		return timedelta(hours=oreStimate)
+	
+	def getTempoFormatted(self) -> str:
+		tempo: list = str(self.calcolaTempo()).split(':')
+		return f'{tempo[0]} H {tempo[1]} M'
+	
+	def calcolaCarburante(self) -> float:
+		tempo: float = self.calcolaTempo() / timedelta(hours=1)
+		return tempo * self.aeromobilePosseduto.aeromobile.consumoLH
+
+	def getCarburanteFormatted(self) -> str:
+		return f'{self.calcolaCarburante():,.2f} L'
 	
 	@staticmethod
 	def getVoli() -> list['Volo']:
