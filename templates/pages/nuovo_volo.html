@@ -67,6 +67,31 @@
 		</div>
 	</div>
 </div>
+{% if voloEsistente %}
+<div class="modal fade" tabindex="-1" id="volo-esistente-modal">
+	<div class="modal-dialog">
+	  <div class="modal-content">
+		<div class="modal-header">
+		  <h5 class="modal-title"><i class="fas fa-exclamation-triangle"></i> Volo in sospeso</h5>
+		  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		</div>
+		<div class="modal-body">
+			<div class="container-fluid">
+				<div class="row">
+					<div class="col">
+						<p class="text-white bg-danger p-2">Attenzione: esiste già un volo non completato. Procedendo a salvare un nuovo volo verrà cancellato quello in sospeso. Vuoi iniziare il volo in sospeso?</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal-footer">
+		  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, voglio creare un nuovo volo</button>
+		  <a href="{{ url_for('eseguiVolo') }}" class="btn btn-primary">Si, inizia il volo sospeso</a>
+		</div>
+	  </div>
+	</div>
+  </div>
+{% endif %}
 {% endblock %}
 
 {% block before_body_closing_tag %}
@@ -204,6 +229,9 @@
 		document.getElementById('mappa-vfr').addEventListener('click', function() {
 			mappa.removeLayer(layerPolitico).addLayer(layerVfr);
 		});
+		{% if voloEsistente %}
+		bootstrap.Modal.getOrCreateInstance(document.getElementById('volo-esistente-modal')).show();
+		{% endif %}
 	});
 </script>
 {% endblock %}

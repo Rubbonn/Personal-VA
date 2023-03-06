@@ -112,6 +112,9 @@ def nuovoVolo():
 	from classes.forms.NuovoVolo import NuovoVolo
 	nuovoVoloForm: NuovoVolo = NuovoVolo(request.form)
 	if request.method == 'POST' and nuovoVoloForm.validate():
+		vecchioVolo: Volo = Volo.getUltimoVoloDaFare()
+		if vecchioVolo.id is not None:
+			vecchioVolo.delete()
 		nuovoVolo: Volo = Volo()
 		nuovoVolo.aeromobilePosseduto = AeromobilePosseduto(nuovoVoloForm.aeromobile.data)
 		nuovoVolo.aeroportoPartenza = Aeroporto(nuovoVoloForm.aeroportoPartenza.data)
@@ -119,11 +122,15 @@ def nuovoVolo():
 		nuovoVolo.dataCreazione = datetime.now()
 		nuovoVolo.save()
 		if 'save' in request.form:
+			flash('Volo salvato e pronto', 'success')
 			return redirect(url_for('homepage'))
 		elif 'saveAndStart' in request.form:
-			# TODO Cambiare il redirect con la pagina del volo quando pronta
-			return redirect(url_for('homepage'))
-	return render_template('pages/nuovo_volo.html', nuovoVoloForm=nuovoVoloForm)
+			return redirect(url_for('eseguiVolo'))
+	return render_template('pages/nuovo_volo.html', nuovoVoloForm=nuovoVoloForm, voloEsistente=True if Volo.getUltimoVoloDaFare().id is not None else False)
+
+@app.route('/esegui-volo')
+def eseguiVolo():
+	pass
 
 @app.route('/ajax/getPrezzoCarburante/<int:idAeroporto>/<int:idCarburante>')
 def getPrezzoCarburante(idAeroporto:int, idCarburante:int):

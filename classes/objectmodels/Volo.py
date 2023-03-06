@@ -49,6 +49,16 @@ class Volo:
 			return self.add()
 		return self.update()
 	
+	def delete(self) -> bool:
+		if self.id is None:
+			return True
+		db: sqlite3.Connection = Database()
+		c: sqlite3.Cursor = db.execute('DELETE FROM voli WHERE id = ?', (self.id,))
+		db.commit()
+		if c.rowcount > 0:
+			return True
+		return False
+	
 	@staticmethod
 	def getVoli() -> list['Volo']:
 		db: sqlite3.Connection = Database()
@@ -58,5 +68,8 @@ class Volo:
 	@staticmethod
 	def getUltimoVoloDaFare() -> 'Volo':
 		db: sqlite3.Connection = Database()
-		id, = db.execute('SELECT id FROM voli WHERE data_fine IS NULL ORDER BY data_creazione ASC').fetchone()
+		volo: tuple | None = db.execute('SELECT id FROM voli WHERE data_fine IS NULL ORDER BY data_creazione ASC').fetchone()
+		if volo is None:
+			return Volo()
+		id, = volo
 		return Volo(id)
